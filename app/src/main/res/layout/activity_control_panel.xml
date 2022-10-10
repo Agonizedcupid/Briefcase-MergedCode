@@ -1,0 +1,295 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TableLayout  xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:stretchColumns="*">
+
+    <TableRow android:gravity="center">
+
+        <Button
+            android:id="@+id/sync"
+            android:layout_width="wrap_content"
+            android:layout_height="65dp"
+            android:layout_below="@+id/stock"
+            android:layout_alignParentStart="false"
+            android:layout_alignParentLeft="false"
+            android:background="#1EAAF1"
+            android:fontFamily="@font/app_font_bold"
+            android:text="Synchronize Data"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:textColor="@color/black"
+            app:backgroundTint="#1EAAF1" />
+
+    </TableRow>
+    <TableRow android:gravity="center">
+
+        <TextView
+            android:id="@+id/users"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentTop="true"
+            android:fontFamily="@font/app_font_bold"
+            android:padding="5dp"
+            android:text="Users"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:textColor="@color/black" />
+        <TextView
+            android:id="@+id/users_count"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentTop="true"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:textColor="@android:color/holo_red_dark" />
+    </TableRow>
+
+    <TableRow android:gravity="center">
+
+        <TextView
+            android:id="@+id/stocktext"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/downloading_cust_history"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentLeft="true"
+            android:fontFamily="@font/app_font_bold"
+            android:padding="5dp"
+            android:text="Products"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:textColor="@color/black" />
+
+        <TextView
+            android:id="@+id/stocktext_count"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:layout_below="@+id/downloading_cust_history"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:textColor="@android:color/holo_red_dark" />
+
+    </TableRow>
+    <TableRow android:gravity="center">
+
+        <TextView
+            android:id="@+id/deliveryaddress"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/stocktext"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentLeft="true"
+            android:fontFamily="@font/app_font_bold"
+            android:padding="5dp"
+            android:text="Addresses"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:textColor="@color/black" />
+
+        <TextView
+            android:id="@+id/deliveryaddress_count"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:layout_below="@+id/stocktext"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:textColor="@android:color/holo_red_dark" />
+    </TableRow>
+    <TableRow android:gravity="center">
+
+        <TextView
+            android:id="@+id/usertype"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/deliveryaddress"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentLeft="true"
+            android:fontFamily="@font/app_font_bold"
+            android:padding="5dp"
+            android:text="User Types"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:textColor="@color/black" />
+        <TextView
+            android:id="@+id/usertype_count"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:textColor="@android:color/holo_red_dark"
+            android:layout_below="@+id/deliveryaddress"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true" />
+    </TableRow>
+    <TableRow android:gravity="center">
+
+        <TextView
+            android:id="@+id/orderpattern"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/usertype"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentLeft="true"
+            android:fontFamily="@font/app_font_bold"
+            android:padding="5dp"
+            android:text="Pattern"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:textColor="@color/black" />
+        <TextView
+            android:id="@+id/orderpattern_count"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:layout_below="@+id/usertype"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:textColor="@android:color/holo_red_dark" />
+    </TableRow>
+    <TableRow android:gravity="center">
+
+        <TextView
+            android:id="@+id/prices"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/orderpattern"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentLeft="true"
+            android:fontFamily="@font/app_font_bold"
+            android:padding="5dp"
+            android:text="Customer Prices"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:textColor="@color/black" />
+        <TextView
+            android:id="@+id/prices_count"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:layout_below="@+id/orderpattern"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:textColor="@android:color/holo_red_dark" />
+    </TableRow>
+    <TableRow android:gravity="center">
+
+        <TextView
+            android:id="@+id/groupspecials"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/prices"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentLeft="true"
+            android:fontFamily="@font/app_font_bold"
+            android:padding="5dp"
+            android:text="Group Prices"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:textColor="@color/black" />
+        <TextView
+            android:id="@+id/groupspecials_count"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:layout_below="@+id/prices"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:textColor="@android:color/holo_red_dark" />
+    </TableRow>
+    <TableRow android:gravity="center">
+
+        <TextView
+            android:id="@+id/customer"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/groupspecials"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentLeft="true"
+            android:fontFamily="@font/app_font_bold"
+            android:padding="5dp"
+            android:text="Customers"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:textColor="@color/black" />
+        <TextView
+            android:id="@+id/customer_count"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:layout_below="@+id/groupspecials"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:textColor="@android:color/holo_red_dark" />
+    </TableRow>
+    <TableRow android:gravity="center">
+
+        <TextView
+            android:id="@+id/pricelist"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/customer"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentLeft="true"
+            android:fontFamily="@font/app_font_bold"
+            android:padding="5dp"
+            android:text="Price Lists"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:textColor="@color/black" />
+        <TextView
+            android:id="@+id/pricelist_count"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:layout_below="@+id/customer"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:textColor="@android:color/holo_red_dark" />
+    </TableRow>
+    <TableRow android:gravity="center">
+
+        <TextView
+            android:id="@+id/downloading_cust_history"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/stock"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentLeft="true"
+            android:fontFamily="@font/app_font_bold"
+            android:padding="5dp"
+            android:text="Order History"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:textColor="@color/black" />
+        <TextView
+            android:id="@+id/downloading_cust_history_count"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@android:color/holo_red_dark"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:layout_below="@+id/stock"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true" />
+    </TableRow>
+    <TableRow android:gravity="center">
+
+        <TextView
+            android:id="@+id/txtoverallspecial"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/stock"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentLeft="true"
+            android:fontFamily="@font/app_font_bold"
+            android:padding="5dp"
+            android:text="Overall Specials"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:textColor="@color/black" />
+        <TextView
+            android:id="@+id/downloadoverallspecial"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@android:color/holo_red_dark"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:layout_below="@+id/stock"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true" />
+    </TableRow>
+
+</TableLayout>

@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MainActivity">
+
+    <androidx.cardview.widget.CardView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:cardBackgroundColor="@android:color/white"
+        app:cardCornerRadius="25dp"
+        app:cardElevation="25dp"
+        app:cardUseCompatPadding="true">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="520dp"
+            android:layout_gravity="center"
+            android:layout_margin="25dp"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:gravity="center"
+                android:text="Salesman Briefcase"
+                android:textColor="@android:color/black"
+                android:textSize="18sp"
+                android:textStyle="bold" />
+
+            <EditText
+                android:id="@+id/userNameEditText"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:layout_marginTop="100dp"
+                android:background="@drawable/edit_text_background"
+                android:hint="Enter Username"
+                android:paddingLeft="15dp"
+                android:textColor="@android:color/black" />
+
+            <EditText
+                android:id="@+id/pinCodeEditText"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:layout_marginTop="15dp"
+                android:background="@drawable/edit_text_background"
+                android:hint="Enter Pin Code"
+                android:inputType="textPassword"
+                android:paddingLeft="15dp"
+                android:textColor="@android:color/black" />
+
+
+            <Button
+                android:id="@+id/logInBtn"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:layout_marginTop="50dp"
+                android:text="Log In"
+                android:textColor="@android:color/white" />
+
+            <ImageView
+                android:id="@+id/imageView"
+                android:layout_width="124dp"
+                android:layout_height="106dp"
+                android:layout_gravity="center"
+                app:srcCompat="@drawable/salesmanbriefcases" />
+
+            <Button
+                android:id="@+id/btnregister"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Register"
+                android:visibility="invisible" />
+
+            <TextView
+                android:id="@+id/theVersion"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Version 1.0" />
+
+        </LinearLayout>
+
+    </androidx.cardview.widget.CardView>
+
+</RelativeLayout>

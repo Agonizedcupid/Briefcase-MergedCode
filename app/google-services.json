@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "633937696672",
+    "project_id": "briefcase-3947a",
+    "storage_bucket": "briefcase-3947a.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:633937696672:android:e8ace44f9d9e345797b6c5",
+        "android_client_info": {
+          "package_name": "com.reginald.briefcaseglobal"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "633937696672-c8b5eokihfaas24v1aju897najjo8dcp.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAhMmC8NexAxMJ545KKmDuQuN9Zh8CjNq8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "633937696672-c8b5eokihfaas24v1aju897najjo8dcp.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
