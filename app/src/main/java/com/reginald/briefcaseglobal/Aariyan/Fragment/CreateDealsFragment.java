@@ -16,6 +16,7 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.os.Handler;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -28,6 +29,7 @@ import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.reginald.briefcaseglobal.Aariyan.Activity.DealsButtonActivity;
 import com.reginald.briefcaseglobal.Aariyan.Adapter.ItemAdapter;
+import com.reginald.briefcaseglobal.Aariyan.Interface.ClickProduct;
 import com.reginald.briefcaseglobal.Aariyan.Interface.RestApis;
 import com.reginald.briefcaseglobal.Aariyan.Model.ProductModel;
 import com.reginald.briefcaseglobal.Aariyan.ViewModel.ProductViewModel;
@@ -37,7 +39,7 @@ import com.reginald.briefcaseglobal.R;
 
 import java.util.List;
 
-public class CreateDealsFragment extends Fragment implements View.OnClickListener {
+public class CreateDealsFragment extends Fragment implements View.OnClickListener, ClickProduct {
 
     private DealsButtonActivity activity;
 
@@ -135,6 +137,9 @@ public class CreateDealsFragment extends Fragment implements View.OnClickListene
         afterSelectedCost = bottomSheetView.findViewById(R.id.selectedItemCost);
         sellingPrice = bottomSheetView.findViewById(R.id.enterSellingPrice);
 
+        divider = bottomSheetView.findViewById(R.id.divider);
+        dividerTwo = bottomSheetView.findViewById(R.id.dividerTwo);
+
         gpBtn = bottomSheetView.findViewById(R.id.gpBtn);
         assert gpBtn != null;
         gpBtn.setOnClickListener(this);
@@ -163,12 +168,13 @@ public class CreateDealsFragment extends Fragment implements View.OnClickListene
     }
 
     private void loadProduct(RestApis apiService) {
+        ClickProduct clickProduct = this;
         viewModel = new ViewModelProvider(this).get(ProductViewModel.class);
         viewModel.init(apiService, code);
         viewModel.getListOfProducts().observe(activity, new Observer<List<ProductModel>>() {
             @Override
             public void onChanged(List<ProductModel> productModels) {
-                ItemAdapter adapter = new ItemAdapter(activity, productModels);
+                ItemAdapter adapter = new ItemAdapter(activity, productModels, clickProduct);
                 itemToBeSelectedList.setAdapter(adapter);
                 adapter.notifyDataSetChanged();
             }
@@ -204,5 +210,18 @@ public class CreateDealsFragment extends Fragment implements View.OnClickListene
         //assert layout != null;
         layout.setMinimumHeight(Resources.getSystem().getDisplayMetrics().heightPixels);
         dialog.show();
+    }
+
+    @Override
+    public void carryModel(ProductModel model) {
+        selectedItemLayout.setVisibility(View.VISIBLE);
+        dividerTwo.setVisibility(View.VISIBLE);
+
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                bottomLayout.setVisibility(View.VISIBLE);
+            }
+        },2000);
     }
 }
