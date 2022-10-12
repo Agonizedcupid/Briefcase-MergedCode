@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:title="Create Deals"
+        android:icon="@drawable/create_deals_icon"
+        android:id="@+id/createDealsMenu"
+        app:showAsAction="always"
+        />
+
+    <item
+        android:title="Update Deals"
+        android:icon="@drawable/update_deals_icon"
+        android:id="@+id/updateDealsMenu"
+        app:showAsAction="always"
+        />
+
+</menu>

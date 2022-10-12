@@ -8,6 +8,13 @@
         <item name="colorAccent">@color/myblue</item>
     </style>
 
+<!--    <style name="myTheme" parent="Theme.AppCompat.Light.NoActionBar">-->
+<!--        &lt;!&ndash; Customize your theme here. &ndash;&gt;-->
+<!--        <item name="colorPrimary">@color/myblue</item>-->
+<!--        <item name="colorPrimaryDark">@color/myblue</item>-->
+<!--        <item name="colorAccent">@color/myblue</item>-->
+<!--    </style>-->
+
     <style name="AppTheme.NoActionBar">
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>

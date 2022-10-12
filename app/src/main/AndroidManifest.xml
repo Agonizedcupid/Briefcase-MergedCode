@@ -21,10 +21,27 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Briefcaseglobal"
         android:usesCleartextTraffic="true">
+<!--        <activity-->
+<!--            android:name=".Aariyan.DealsButtonActivity"-->
+<!--            android:exported="false">-->
+<!--            <meta-data-->
+<!--                android:name="android.app.lib_name"-->
+<!--                android:value="" />-->
+<!--        </activity>-->
+
+        <!--For Testing-->
+        <activity
+            android:name=".LandingActivity"
+            android:exported="false">
+            <meta-data
+                android:name="android.app.lib_name"
+                android:value="" />
+        </activity>
+
         <service
-            android:name=".MainService"
+            android:name=".Service.MainService"
             android:enabled="true"
-            android:exported="true"></service>
+            android:exported="true" />
 
         <activity
             android:name=".VisitQueue"
@@ -133,16 +150,31 @@
         <activity
             android:name=".Sales"
             android:screenOrientation="portrait" />
-        <activity
-            android:name=".LandingActivity"
-            android:exported="true"
-            android:screenOrientation="portrait">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
 
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
+        <!--This is the main launcher activity-->
+<!--        <activity-->
+<!--            android:name=".LandingActivity"-->
+<!--            android:exported="true"-->
+<!--            android:screenOrientation="portrait">-->
+<!--            <intent-filter>-->
+<!--                <action android:name="android.intent.action.MAIN" />-->
+
+<!--                <category android:name="android.intent.category.LAUNCHER" />-->
+<!--            </intent-filter>-->
+<!--        </activity>-->
+
+        <!--Test Launcher Activity-->
+                <activity
+                    android:name=".Aariyan.Activity.DealsButtonActivity"
+                    android:exported="true"
+                    android:theme="@style/myTheme"
+                    android:screenOrientation="portrait">
+                    <intent-filter>
+                        <action android:name="android.intent.action.MAIN" />
+
+                        <category android:name="android.intent.category.LAUNCHER" />
+                    </intent-filter>
+                </activity>
 
         <service
             android:name=".DriverService"

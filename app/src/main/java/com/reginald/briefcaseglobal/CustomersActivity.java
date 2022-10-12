@@ -19,7 +19,6 @@ import android.net.ConnectivityManager;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Environment;
 import android.text.InputType;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -35,11 +34,12 @@ import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
-import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.reginald.briefcaseglobal.Aariyan.Activity.DealsButtonActivity;
 
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
@@ -339,6 +339,10 @@ public class CustomersActivity extends AppCompatActivity {
     Dialog dialogViewinner;
     ListView listcustomers,lvproducts,lvlistofcustomerorders,lvproductsavailable,lvselecteditems,lverrors;
     ImageView closeitemselected;
+
+
+    private Button goNext;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -361,6 +365,15 @@ public class CustomersActivity extends AppCompatActivity {
         buttonOrderComplete =(Button) findViewById(R.id.nextcustomercentral);
         outstandingorders =(Button) findViewById(R.id.outstandingorders);
         listcustomers =(ListView) findViewById(R.id.listcustomers);
+
+        goNext = findViewById(R.id.goNext);
+        goNext.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(CustomersActivity.this, DealsButtonActivity.class));
+            }
+        });
+
         getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
         if(CheckIfMerchie()>0){
             buttonOrderComplete.setVisibility(View.INVISIBLE);
