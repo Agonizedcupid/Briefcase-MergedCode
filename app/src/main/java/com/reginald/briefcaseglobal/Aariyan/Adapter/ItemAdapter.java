@@ -5,8 +5,11 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Filter;
+import android.widget.Filterable;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -16,18 +19,21 @@ import com.reginald.briefcaseglobal.Aariyan.Model.ProductModel;
 import com.reginald.briefcaseglobal.Aariyan.ViewModel.ProductViewModel;
 import com.reginald.briefcaseglobal.R;
 
+import java.util.ArrayList;
 import java.util.List;
 
-public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ViewHolder> {
+public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ViewHolder> implements Filterable {
 
     private Context context;
     List<ProductModel> listOfProduct;
     private ClickProduct clickProduct;
+    private List<ProductModel> copiedList;
 
     public ItemAdapter(Context context, List<ProductModel> listOfProduct, ClickProduct clickProduct) {
         this.context = context;
         this.listOfProduct = listOfProduct;
         this.clickProduct = clickProduct;
+        copiedList = new ArrayList<>(listOfProduct);
     }
 
     @NonNull
@@ -58,6 +64,45 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ViewHolder> {
     @Override
     public int getItemCount() {
         return listOfProduct.size();
+    }
+    private final Filter filter = new Filter() {
+        @Override
+        protected FilterResults performFiltering(CharSequence constraint) {
+            List<ProductModel> filteredList = new ArrayList<>();
+
+            if (constraint == null || constraint.length() == 0) {
+                filteredList.addAll(copiedList);
+            } else {
+                String query = constraint.toString().toLowerCase().trim();
+
+                for (ProductModel model : copiedList) {
+                    if (model.getStrDesc().toLowerCase().contains(query)) {
+                        filteredList.add(model);
+                    }
+//                    else {
+//                        Toast.makeText(context, "No Apps found!", Toast.LENGTH_SHORT).show();
+//                    }
+                }
+            }
+
+            FilterResults results = new FilterResults();
+            results.values = filteredList;
+            return results;
+        }
+
+        @Override
+        protected void publishResults(CharSequence charSequence, FilterResults filterResults) {
+
+            listOfProduct.clear();
+            listOfProduct.addAll((List) filterResults.values);
+            notifyDataSetChanged();
+
+        }
+    };
+
+    @Override
+    public Filter getFilter() {
+        return filter;
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {

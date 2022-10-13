@@ -4,6 +4,7 @@ import android.util.Log;
 
 import androidx.lifecycle.MutableLiveData;
 
+import com.reginald.briefcaseglobal.Aariyan.Database.DatabaseAdapter;
 import com.reginald.briefcaseglobal.Aariyan.Interface.ProductListInterface;
 import com.reginald.briefcaseglobal.Aariyan.Interface.RestApis;
 import com.reginald.briefcaseglobal.Aariyan.Model.ProductModel;
@@ -24,8 +25,8 @@ public class ProductRepository {
 
     private MutableLiveData<List<ProductModel>> listOfProduct = new MutableLiveData<>();
 
-    public MutableLiveData<List<ProductModel>> getListOfProduct(RestApis apis, String customerCode) {
-        new ProductFeedback().getProductFromServer(new ProductListInterface() {
+    public MutableLiveData<List<ProductModel>> getListOfProduct(RestApis apis, String customerCode, DatabaseAdapter databaseAdapter) {
+        new ProductFeedback(databaseAdapter).getProductFromServer(new ProductListInterface() {
             @Override
             public void listOfProduct(List<ProductModel> listOfProducts) {
                 listOfProduct.setValue(listOfProducts);

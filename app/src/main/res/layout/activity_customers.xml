@@ -161,7 +161,6 @@
         android:layout_marginEnd="8dp"
         android:layout_marginBottom="9dp"
         android:fontFamily="@font/app_font_bold"
-        android:text="TextView"
         app:layout_constraintBottom_toTopOf="@+id/nextcustomercentral"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -189,7 +188,7 @@
         android:layout_marginTop="8dp"
         android:layout_marginEnd="8dp"
         android:fontFamily="@font/app_font_bold"
-        android:text="Go -> Next"
+        android:text="Deals"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@id/outstandingorders"
         app:layout_constraintTop_toTopOf="parent" />

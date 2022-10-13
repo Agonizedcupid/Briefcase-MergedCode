@@ -12,6 +12,7 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
@@ -68,7 +69,7 @@ public class CustomersActivity extends AppCompatActivity {
         String ItemString4;
 
 
-        Item(String t, String t2,String t3, String t4) {
+        Item(String t, String t2, String t3, String t4) {
             ItemString = t;
             ItemString2 = t2;
             ItemString3 = t3;
@@ -76,6 +77,7 @@ public class CustomersActivity extends AppCompatActivity {
 
         }
     }
+
     public class Item2 {
 
         String ItemString;
@@ -93,6 +95,7 @@ public class CustomersActivity extends AppCompatActivity {
             ItemString5 = t5;*/
         }
     }
+
     public class ItemCustomerHistory {
 
         String ItemString;
@@ -118,6 +121,7 @@ public class CustomersActivity extends AppCompatActivity {
         TextView text3;
 
     }
+
     static class ViewHolder2 {
         //ImageView icon;
         TextView textproductDescription;
@@ -126,6 +130,7 @@ public class CustomersActivity extends AppCompatActivity {
       /*  TextView textVat;
         TextView textOnclusive;*/
     }
+
     static class ViewHolder3 {
         //ImageView icon;
         TextView text1;
@@ -192,6 +197,7 @@ public class CustomersActivity extends AppCompatActivity {
             return list;
         }
     }
+
     public class ItemsListAdapterAlpha extends BaseAdapter {
 
         private Context context;
@@ -237,7 +243,6 @@ public class CustomersActivity extends AppCompatActivity {
             ViewHolder holder = (ViewHolder) rowView.getTag();
             // holder.icon.setImageDrawable(list.get(position).ItemDrawable);
             holder.text.setText(list.get(position).ItemString);
-
 
 
             return rowView;
@@ -298,20 +303,16 @@ public class CustomersActivity extends AppCompatActivity {
             holder.text2.setText(list.get(position).ItemString2);
             holder.text3.setText(list.get(position).ItemString3);
 
-            Log.e("xxxx","*************************************"+list.get(position).ItemString4);
-            if(list.get(position).ItemString4.equals("1"))
-            {
+            Log.e("xxxx", "*************************************" + list.get(position).ItemString4);
+            if (list.get(position).ItemString4.equals("1")) {
                 holder.text4.setText("YES");
-                holder.text4.setBackgroundColor(Color.rgb(0,255,0));
+                holder.text4.setBackgroundColor(Color.rgb(0, 255, 0));
             }
-            if(list.get(position).ItemString4.equals("0"))
-            {
-                Log.e("text4","*************************************"+list.get(position).ItemString4);
+            if (list.get(position).ItemString4.equals("0")) {
+                Log.e("text4", "*************************************" + list.get(position).ItemString4);
                 holder.text4.setText("NO");
-                holder.text4.setBackgroundColor(Color.rgb(255,0,0));
+                holder.text4.setBackgroundColor(Color.rgb(255, 0, 0));
             }
-
-
 
 
             return rowView;
@@ -321,27 +322,32 @@ public class CustomersActivity extends AppCompatActivity {
             return list;
         }
     }
-    List<Item> items1,items3AlphaList;
-    List<ItemCustomerHistory> itemstodayorders,itemLinesselected;
+
+    List<Item> items1, items3AlphaList;
+    List<ItemCustomerHistory> itemstodayorders, itemLinesselected;
     ItemsListAdapterAlpha myItemsListAdapter3Alpha;
-    ItemsListAdapter myItemsListAdapter1 ;
-    ItemsListAdapterOrders myItemOrdersAdapter,myItemOrdersAdapterSelected ;
+    ItemsListAdapter myItemsListAdapter1;
+    ItemsListAdapterOrders myItemOrdersAdapter, myItemOrdersAdapterSelected;
     ArrayList<String> stringArrayList = new ArrayList<String>();
     ProgressDialog progressDoalog;
-    DatePickerDialog picker,pickerto,pickeraddspecialTo,pickeraddspecialfrom;
+    DatePickerDialog picker, pickerto, pickeraddspecialTo, pickeraddspecialfrom;
 
-    EditText editSearch,selectedcustomer,editsearchproduct,strprodcode,strName,fltcosts,selingprice,eddatefrom,dteto,dtefrom,edtdtefromTo,edtsellingprice,searchproduct;
-    Button buttonSearch,buttonCustomerHistory,buttonToday,buttonNext,outstandingorders,buttonOrderComplete,sendspecial,searchprodspecial,btnclose,close_ordersdialog,btnclosedialog,shistory,dltspecial,clssaving,gp,saverecord,btnaddspecials,btnsearch,btnsavespecial,btnclsadding;
-    TextView custcode,dialogcustomername,prodname,productcode,txtcosts,etdgp,custcodedialog,  custcodedialogtxt, txtcustomername,txtcustcode,acceptablegp,itemgps,specialheader;;
-    String roles,userID,searchText,IP,DimsIp;
-    String Result = "",OrderId="",subscriberId;
-    private SQLiteDatabase db,dbOrders;
+    EditText editSearch, selectedcustomer, editsearchproduct, strprodcode, strName, fltcosts, selingprice, eddatefrom, dteto, dtefrom, edtdtefromTo, edtsellingprice, searchproduct;
+    Button buttonSearch, buttonCustomerHistory, buttonToday, buttonNext, outstandingorders, buttonOrderComplete, sendspecial, searchprodspecial, btnclose, close_ordersdialog, btnclosedialog, shistory, dltspecial, clssaving, gp, saverecord, btnaddspecials, btnsearch, btnsavespecial, btnclsadding;
+    TextView custcode, dialogcustomername, prodname, productcode, txtcosts, etdgp, custcodedialog, custcodedialogtxt, txtcustomername, txtcustcode, acceptablegp, itemgps, specialheader;
+    ;
+    String roles, userID, searchText, IP, DimsIp;
+    String Result = "", OrderId = "", subscriberId;
+    private SQLiteDatabase db, dbOrders;
     Dialog dialogViewinner;
-    ListView listcustomers,lvproducts,lvlistofcustomerorders,lvproductsavailable,lvselecteditems,lverrors;
+    ListView listcustomers, lvproducts, lvlistofcustomerorders, lvproductsavailable, lvselecteditems, lverrors;
     ImageView closeitemselected;
 
 
     private Button goNext;
+
+    SharedPreferences sharedPreferences;
+    SharedPreferences.Editor editor;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -350,32 +356,42 @@ public class CustomersActivity extends AppCompatActivity {
         setContentView(R.layout.activity_customers);
         File file = new File("Salesmanbriefcase");
 
+        sharedPreferences = getSharedPreferences("IP_FILE", MODE_PRIVATE);
+        editor = sharedPreferences.edit();
+
         // final String dir =   Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS) +"/";
-        db = this.openOrCreateDatabase( getApplicationContext().getFilesDir()+ "/LinxBriefcaseDB.db", SQLiteDatabase.CREATE_IF_NECESSARY, null);
+        db = this.openOrCreateDatabase(getApplicationContext().getFilesDir() + "/LinxBriefcaseDB.db", SQLiteDatabase.CREATE_IF_NECESSARY, null);
 
-        dbOrders = this.openOrCreateDatabase( getApplicationContext().getFilesDir()+ "/LinxBriefcaseOrders.db", SQLiteDatabase.CREATE_IF_NECESSARY, null);
+        dbOrders = this.openOrCreateDatabase(getApplicationContext().getFilesDir() + "/LinxBriefcaseOrders.db", SQLiteDatabase.CREATE_IF_NECESSARY, null);
 
-        editSearch =(EditText) findViewById(R.id.editSearch);
-        selectedcustomer =(EditText) findViewById(R.id.selectedcustomer);
-        custcode =(TextView) findViewById(R.id.custcode);
-        buttonSearch =(Button) findViewById(R.id.buttonSearch);
-        buttonCustomerHistory =(Button) findViewById(R.id.buttonCustomerHistory);
-        buttonNext =(Button) findViewById(R.id.nextorderheader);
-        buttonToday =(Button) findViewById(R.id.buttonToday);
-        buttonOrderComplete =(Button) findViewById(R.id.nextcustomercentral);
-        outstandingorders =(Button) findViewById(R.id.outstandingorders);
-        listcustomers =(ListView) findViewById(R.id.listcustomers);
+        editSearch = (EditText) findViewById(R.id.editSearch);
+        selectedcustomer = (EditText) findViewById(R.id.selectedcustomer);
+        custcode = (TextView) findViewById(R.id.custcode);
+        buttonSearch = (Button) findViewById(R.id.buttonSearch);
+        buttonCustomerHistory = (Button) findViewById(R.id.buttonCustomerHistory);
+        buttonNext = (Button) findViewById(R.id.nextorderheader);
+        buttonToday = (Button) findViewById(R.id.buttonToday);
+        buttonOrderComplete = (Button) findViewById(R.id.nextcustomercentral);
+        outstandingorders = (Button) findViewById(R.id.outstandingorders);
+        listcustomers = (ListView) findViewById(R.id.listcustomers);
 
         goNext = findViewById(R.id.goNext);
         goNext.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivity(new Intent(CustomersActivity.this, DealsButtonActivity.class));
+                if (!custcode.getText().toString().trim().isEmpty() || !custcode.getText().toString().trim().equals("")) {
+                    editor.putString("CODE", custcode.getText().toString().trim());
+                    editor.commit();
+                    startActivity(new Intent(CustomersActivity.this, DealsButtonActivity.class));
+                } else {
+                    Toast.makeText(CustomersActivity.this, "Select a customer", Toast.LENGTH_SHORT).show();
+                }
+
             }
         });
 
         getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
-        if(CheckIfMerchie()>0){
+        if (CheckIfMerchie() > 0) {
             buttonOrderComplete.setVisibility(View.INVISIBLE);
         }
 
@@ -386,9 +402,9 @@ public class CustomersActivity extends AppCompatActivity {
         outstandingorders.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent i = new Intent(CustomersActivity.this,OutStandingActivity.class);
-                i.putExtra("userID",userID);
-                i.putExtra("roles",roles);
+                Intent i = new Intent(CustomersActivity.this, OutStandingActivity.class);
+                i.putExtra("userID", userID);
+                i.putExtra("roles", roles);
                 startActivity(i);
             }
         });
@@ -403,8 +419,8 @@ public class CustomersActivity extends AppCompatActivity {
 
         if (cursor2.moveToFirst()) {
             do {
-                IP =cursor2.getString(cursor2.getColumnIndex("IP"));
-                DimsIp =cursor2.getString(cursor2.getColumnIndex("DimsIp"));
+                IP = cursor2.getString(cursor2.getColumnIndex("IP"));
+                DimsIp = cursor2.getString(cursor2.getColumnIndex("DimsIp"));
 
             } while (cursor2.moveToNext());
         }
@@ -412,8 +428,8 @@ public class CustomersActivity extends AppCompatActivity {
         listcustomers.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
             public boolean onItemLongClick(AdapterView<?> adapterView, View view, int i, long l) {
-                Item selectedItem2 = (Item)(adapterView.getItemAtPosition(i));
-                Dialog dialogView = new Dialog(CustomersActivity.this,android.R.style.Theme_Light_NoTitleBar_Fullscreen);
+                Item selectedItem2 = (Item) (adapterView.getItemAtPosition(i));
+                Dialog dialogView = new Dialog(CustomersActivity.this, android.R.style.Theme_Light_NoTitleBar_Fullscreen);
                 // dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
                 dialogView.setCancelable(false);
                 dialogView.setContentView(R.layout.customerdialogoptions);
@@ -429,9 +445,9 @@ public class CustomersActivity extends AppCompatActivity {
                 shistory.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
-                        Intent intent = new Intent(CustomersActivity.this,OrderActivity.class);
-                        intent.putExtra("name",txtcustomername.getText().toString());
-                        intent.putExtra("code",custcodedialogtxt.getText().toString());
+                        Intent intent = new Intent(CustomersActivity.this, OrderActivity.class);
+                        intent.putExtra("name", txtcustomername.getText().toString());
+                        intent.putExtra("code", custcodedialogtxt.getText().toString());
                         startActivity(intent);
                         dialogView.dismiss();
                     }
@@ -453,7 +469,7 @@ public class CustomersActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
 
-                if(custcode.getText().toString().trim().length() > 1 && !(custcode.getText().toString()).equals("TextView")  ) {
+                if (custcode.getText().toString().trim().length() > 1 && !(custcode.getText().toString()).equals("TextView")) {
                     Intent i = new Intent(CustomersActivity.this, OrderHeader.class);
                     i.putExtra("userID", userID);
                     i.putExtra("roles", roles);
@@ -469,9 +485,8 @@ public class CustomersActivity extends AppCompatActivity {
                     i.putExtra("custcode",custcode.getText().toString());
                     i.putExtra("custName",selectedcustomer.getText().toString());
                     startActivity(i);*/
-                }else
-                {
-                    final  AlertDialog.Builder dialogretry = new  AlertDialog.Builder(CustomersActivity.this);
+                } else {
+                    final AlertDialog.Builder dialogretry = new AlertDialog.Builder(CustomersActivity.this);
                     dialogretry.setTitle("No Customer")
                             .setMessage("Please Select Customer.")
                             .setPositiveButton("Okay", new DialogInterface.OnClickListener() {
@@ -490,7 +505,7 @@ public class CustomersActivity extends AppCompatActivity {
         editSearch.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
-                Log.e("Touch","********** here");
+                Log.e("Touch", "********** here");
                 getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_NOTHING);
                 editSearch.setImeOptions(EditorInfo.IME_ACTION_DONE);
                 editSearch.setInputType(InputType.TYPE_CLASS_TEXT);
@@ -502,8 +517,8 @@ public class CustomersActivity extends AppCompatActivity {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 Item selectedItem = (Item) (adapterView.getItemAtPosition(i));
-                selectedcustomer.setText(""+selectedItem.ItemString);
-                custcode.setText(""+selectedItem.ItemString2);
+                selectedcustomer.setText("" + selectedItem.ItemString);
+                custcode.setText("" + selectedItem.ItemString2);
 
             }
         });
@@ -521,10 +536,10 @@ public class CustomersActivity extends AppCompatActivity {
                 myItemsListAdapter3Alpha = new ItemsListAdapterAlpha(CustomersActivity.this, items3AlphaList);
 
                 listcustomers.setAdapter(myItemsListAdapter1);
-              //  alpha_listView.setAdapter(myItemsListAdapter3Alpha);
+                //  alpha_listView.setAdapter(myItemsListAdapter3Alpha);
                 editSearch.getText().clear();
                 try {
-                    InputMethodManager imm = (InputMethodManager)getSystemService(INPUT_METHOD_SERVICE);
+                    InputMethodManager imm = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
                     imm.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), 0);
                 } catch (Exception e) {
                     // TODO: handle exception
@@ -538,12 +553,10 @@ public class CustomersActivity extends AppCompatActivity {
                 getTodaysOrders();
                 myItemOrdersAdapter = new ItemsListAdapterOrders(CustomersActivity.this, itemstodayorders);
 
-                Dialog dialogView = new Dialog(CustomersActivity.this,android.R.style.Theme_Light_NoTitleBar_Fullscreen);
+                Dialog dialogView = new Dialog(CustomersActivity.this, android.R.style.Theme_Light_NoTitleBar_Fullscreen);
                 // dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
                 dialogView.setCancelable(false);
                 dialogView.setContentView(R.layout.todays_orders);
-
-
 
 
                 lvlistofcustomerorders = (ListView) dialogView.findViewById(R.id.lvlistofcustomerorders);
@@ -560,8 +573,8 @@ public class CustomersActivity extends AppCompatActivity {
                     public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
 
 
-                        ItemCustomerHistory selectedItem2 = (ItemCustomerHistory)(adapterView.getItemAtPosition(i));
-                        Dialog dialogViewLines = new Dialog(CustomersActivity.this,android.R.style.Theme_Light_NoTitleBar_Fullscreen);
+                        ItemCustomerHistory selectedItem2 = (ItemCustomerHistory) (adapterView.getItemAtPosition(i));
+                        Dialog dialogViewLines = new Dialog(CustomersActivity.this, android.R.style.Theme_Light_NoTitleBar_Fullscreen);
                         dialogViewLines.setCancelable(false);
                         dialogViewLines.setContentView(R.layout.orderlines_list);
                         getTodaysOrdersLines(selectedItem2.ItemString5);
@@ -585,7 +598,7 @@ public class CustomersActivity extends AppCompatActivity {
                 lvlistofcustomerorders.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
                     @Override
                     public boolean onItemLongClick(AdapterView<?> adapterView, View view, int i, long l) {
-                        ItemCustomerHistory selectedItem2 = (ItemCustomerHistory)(adapterView.getItemAtPosition(i));
+                        ItemCustomerHistory selectedItem2 = (ItemCustomerHistory) (adapterView.getItemAtPosition(i));
 
                         AlertDialog.Builder builder = new AlertDialog.Builder(CustomersActivity.this);
                         builder.setMessage(" Check The Transaction.")
@@ -594,13 +607,11 @@ public class CustomersActivity extends AppCompatActivity {
                                 .setPositiveButton("Transact ", new DialogInterface.OnClickListener() {
                                     public void onClick(DialogInterface dialog, int id) {
 
-                                        if(getInvoiceNo(selectedItem2.ItemString5).equals("NO INVOICE"))
-                                        {
+                                        if (getInvoiceNo(selectedItem2.ItemString5).equals("NO INVOICE")) {
                                             if (checkConnection()) {
                                                 startProgress("Trying to Post");
                                                 new UploadNewOrderLinesDetails(selectedItem2.ItemString5).execute();
-                                            }else
-                                            {
+                                            } else {
                                                 AlertDialog.Builder builder = new AlertDialog.Builder(CustomersActivity.this);
                                                 builder.setMessage("No connection")
                                                         .setCancelable(false)
@@ -615,15 +626,14 @@ public class CustomersActivity extends AppCompatActivity {
                                                 alert.show();
                                             }
                                             //repost
-                                        }else
-                                        {
-                                            Log.e("pdforder",DimsIp+"pdforder/"+getInvoiceNo(selectedItem2.ItemString5));
-                                            Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(DimsIp+"pdforder/"+getInvoiceNo(selectedItem2.ItemString5).equals("NO INVOICE")));
+                                        } else {
+                                            Log.e("pdforder", DimsIp + "pdforder/" + getInvoiceNo(selectedItem2.ItemString5));
+                                            Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(DimsIp + "pdforder/" + getInvoiceNo(selectedItem2.ItemString5).equals("NO INVOICE")));
                                             startActivity(browserIntent);
                                         }
                                     }
                                 })
-                            ;
+                        ;
                         AlertDialog alert = builder.create();
                         alert.show();
 
@@ -634,7 +644,7 @@ public class CustomersActivity extends AppCompatActivity {
                 lverrors.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
                     @Override
                     public boolean onItemLongClick(AdapterView<?> adapterView, View view, int i, long l) {
-                        ItemCustomerHistory selectedItem2 = (ItemCustomerHistory)(adapterView.getItemAtPosition(i));
+                        ItemCustomerHistory selectedItem2 = (ItemCustomerHistory) (adapterView.getItemAtPosition(i));
 
                         AlertDialog.Builder builder = new AlertDialog.Builder(CustomersActivity.this);
                         builder.setMessage(" Check The Transaction.")
@@ -643,13 +653,11 @@ public class CustomersActivity extends AppCompatActivity {
                                 .setPositiveButton("Transact ", new DialogInterface.OnClickListener() {
                                     public void onClick(DialogInterface dialog, int id) {
 
-                                        if(getInvoiceNo(selectedItem2.ItemString5).equals("NO INVOICE"))
-                                        {
+                                        if (getInvoiceNo(selectedItem2.ItemString5).equals("NO INVOICE")) {
                                             if (checkConnection()) {
                                                 startProgress("Trying to Post");
                                                 new UploadNewOrderLinesDetails(selectedItem2.ItemString5).execute();
-                                            }else
-                                            {
+                                            } else {
                                                 AlertDialog.Builder builder = new AlertDialog.Builder(CustomersActivity.this);
                                                 builder.setMessage("No connection")
                                                         .setCancelable(false)
@@ -697,11 +705,10 @@ public class CustomersActivity extends AppCompatActivity {
                 getProducts("");
                 myItemsListAdapter1 = new ItemsListAdapter(CustomersActivity.this, items1);
 
-                Dialog dialogView = new Dialog(CustomersActivity.this,android.R.style.Theme_Light_NoTitleBar_Fullscreen);
+                Dialog dialogView = new Dialog(CustomersActivity.this, android.R.style.Theme_Light_NoTitleBar_Fullscreen);
                 // dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
                 dialogView.setCancelable(false);
                 dialogView.setContentView(R.layout.customerpricing);
-
 
 
                 sendspecial = (Button) dialogView.findViewById(R.id.sendspecial);
@@ -718,8 +725,8 @@ public class CustomersActivity extends AppCompatActivity {
                     @Override
                     public boolean onItemLongClick(AdapterView<?> adapterView, View view, int i, long l) {
 
-                        Item selectedItem2 = (Item)(adapterView.getItemAtPosition(i));
-                         dialogViewinner = new Dialog(CustomersActivity.this,android.R.style.Theme_Light_NoTitleBar_Fullscreen);
+                        Item selectedItem2 = (Item) (adapterView.getItemAtPosition(i));
+                        dialogViewinner = new Dialog(CustomersActivity.this, android.R.style.Theme_Light_NoTitleBar_Fullscreen);
                         // dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
                         dialogViewinner.setCancelable(false);
                         dialogViewinner.setContentView(R.layout.dialogupdatepricing);
@@ -777,7 +784,7 @@ public class CustomersActivity extends AppCompatActivity {
                                         new DatePickerDialog.OnDateSetListener() {
                                             @Override
                                             public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
-                                                eddatefrom.setText(year  + "-" + (monthOfYear + 1) + "-" + dayOfMonth);
+                                                eddatefrom.setText(year + "-" + (monthOfYear + 1) + "-" + dayOfMonth);
                                             }
                                         }, year, month, day);
                                 picker.show();
@@ -796,7 +803,7 @@ public class CustomersActivity extends AppCompatActivity {
                                         new DatePickerDialog.OnDateSetListener() {
                                             @Override
                                             public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
-                                                dteto.setText(year  + "-" + (monthOfYear + 1) + "-" + dayOfMonth);
+                                                dteto.setText(year + "-" + (monthOfYear + 1) + "-" + dayOfMonth);
                                             }
                                         }, year, month, day);
                                 pickerto.show();
@@ -805,7 +812,7 @@ public class CustomersActivity extends AppCompatActivity {
                         gp.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View view) {
-                                itemgps.setText(""+marginCalculator(Double.parseDouble(fltcosts.getText().toString()), Double.parseDouble(selingprice.getText().toString())));
+                                itemgps.setText("" + marginCalculator(Double.parseDouble(fltcosts.getText().toString()), Double.parseDouble(selingprice.getText().toString())));
 
                             }
                         });
@@ -826,8 +833,8 @@ public class CustomersActivity extends AppCompatActivity {
                                     alert.show();
 
                                 } else {*/
-                                    new UpdateCustomerSpecials(selectedItem2.ItemString3).execute();
-                              //  }
+                                new UpdateCustomerSpecials(selectedItem2.ItemString3).execute();
+                                //  }
 
 
                             }
@@ -848,7 +855,7 @@ public class CustomersActivity extends AppCompatActivity {
                     }
                 });
 
-                 btnclose.setOnClickListener(new View.OnClickListener() {
+                btnclose.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
 
@@ -856,118 +863,117 @@ public class CustomersActivity extends AppCompatActivity {
                     }
                 });
 
-                 sendspecial.setOnClickListener(new View.OnClickListener() {
-                     @Override
-                     public void onClick(View view) {
-                         Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(DimsIp+"BriefcaseSpecials/"+custcode.getText().toString()));
-                         startActivity(browserIntent);
-                     }
-                 });
+                sendspecial.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(DimsIp + "BriefcaseSpecials/" + custcode.getText().toString()));
+                        startActivity(browserIntent);
+                    }
+                });
                 searchprodspecial.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
 
                         getProducts(editsearchproduct.getText().toString());
-                       // dialogView.dismiss();
+                        // dialogView.dismiss();
                     }
                 });
 
-                    btnaddspecials.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View view) {
+                btnaddspecials.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
 
-                            getProducts("");
-                            myItemsListAdapter1 = new ItemsListAdapter(CustomersActivity.this, items1);
+                        getProducts("");
+                        myItemsListAdapter1 = new ItemsListAdapter(CustomersActivity.this, items1);
 
-                            Dialog dialogViewaddspecials = new Dialog(CustomersActivity.this,android.R.style.Theme_Light_NoTitleBar_Fullscreen);
-                            // dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-                            dialogViewaddspecials.setCancelable(false);
-                            dialogViewaddspecials.setContentView(R.layout.addspecial);
+                        Dialog dialogViewaddspecials = new Dialog(CustomersActivity.this, android.R.style.Theme_Light_NoTitleBar_Fullscreen);
+                        // dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+                        dialogViewaddspecials.setCancelable(false);
+                        dialogViewaddspecials.setContentView(R.layout.addspecial);
 
-                            btnsearch = (Button) dialogViewaddspecials.findViewById(R.id.btnsearch);
-                            btnsavespecial = (Button) dialogViewaddspecials.findViewById(R.id.btnsavespecial);
-                            btnclsadding = (Button) dialogViewaddspecials.findViewById(R.id.btnclsadding);
-                            lvproductsavailable = (ListView) dialogViewaddspecials.findViewById(R.id.lvproductsavailable);
-                            dtefrom = (EditText) dialogViewaddspecials.findViewById(R.id.dtefrom);
-                            edtdtefromTo = (EditText) dialogViewaddspecials.findViewById(R.id.edtdtefrom);
-                            edtsellingprice = (EditText) dialogViewaddspecials.findViewById(R.id.edtsellingprice);
-                            searchproduct = (EditText) dialogViewaddspecials.findViewById(R.id.searchproduct);
-                            prodname = (TextView) dialogViewaddspecials.findViewById(R.id.prodname);
-                            productcode = (TextView) dialogViewaddspecials.findViewById(R.id.productcode);
-                            txtcosts = (TextView) dialogViewaddspecials.findViewById(R.id.txtcosts);
-                            etdgp = (TextView) dialogViewaddspecials.findViewById(R.id.textView34);
-                            custcodedialog = (TextView) dialogViewaddspecials.findViewById(R.id.custcodedialog);
-                            acceptablegp = (TextView) dialogViewaddspecials.findViewById(R.id.acceptablegp);
-                            specialheader = (TextView) dialogViewaddspecials.findViewById(R.id.specialheader);
-                            acceptablegp.setText("0");
-                            Long tsLong = System.currentTimeMillis()/1000;
-                            String ts = tsLong.toString();
-                            subscriberId = ts+"-"+android.provider.Settings.Secure.getString(getContentResolver(), android.provider.Settings.Secure.ANDROID_ID);
-                            Calendar c = Calendar.getInstance();
-                            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-                            String tm =  sdf.format(c.getTime());
-                            dtefrom.setText(tm);
-                            edtdtefromTo.setText(tm);
-                            custcodedialog.setText(custcode.getText().toString());
-
-
-                            returnProducts("");
-
-                            dtefrom.setOnClickListener(new View.OnClickListener() {
-                                @Override
-                                public void onClick(View view) {
-                                    final Calendar cldr = Calendar.getInstance();
-                                    int day = cldr.get(Calendar.DAY_OF_MONTH);
-                                    int month = cldr.get(Calendar.MONTH);
-                                    int year = cldr.get(Calendar.YEAR);
-                                    // date picker dialog
-                                    pickeraddspecialfrom = new DatePickerDialog(CustomersActivity.this,
-                                            new DatePickerDialog.OnDateSetListener() {
-                                                @Override
-                                                public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
-                                                    dtefrom.setText(year  + "-" + (monthOfYear + 1) + "-" + dayOfMonth);
-                                                }
-                                            }, year, month, day);
-                                    pickeraddspecialfrom.show();
-                                }
-                            });
-                            edtdtefromTo.setOnClickListener(new View.OnClickListener() {
-                                @Override
-                                public void onClick(View view) {
-                                    final Calendar cldr = Calendar.getInstance();
-                                    int day = cldr.get(Calendar.DAY_OF_MONTH);
-                                    int month = cldr.get(Calendar.MONTH);
-                                    int year = cldr.get(Calendar.YEAR);
-                                    // date picker dialog
-                                    pickeraddspecialTo = new DatePickerDialog(CustomersActivity.this,
-                                            new DatePickerDialog.OnDateSetListener() {
-                                                @Override
-                                                public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
-                                                    edtdtefromTo.setText(year  + "-" + (monthOfYear + 1) + "-" + dayOfMonth);
-                                                }
-                                            }, year, month, day);
-                                    pickeraddspecialTo.show();
-                                }
-                            });
-                            btnsearch.setOnClickListener(new View.OnClickListener() {
-                                @Override
-                                public void onClick(View view) {
-                                    returnProducts(searchproduct.getText().toString());
-                                }
-                            });
-                            btnclsadding.setOnClickListener(new View.OnClickListener() {
-                                @Override
-                                public void onClick(View view) {
-                                    dialogViewaddspecials.dismiss();
-                                }
-                            });
-                            btnsavespecial.setOnClickListener(new View.OnClickListener() {
-                                @Override
-                                public void onClick(View view) {
+                        btnsearch = (Button) dialogViewaddspecials.findViewById(R.id.btnsearch);
+                        btnsavespecial = (Button) dialogViewaddspecials.findViewById(R.id.btnsavespecial);
+                        btnclsadding = (Button) dialogViewaddspecials.findViewById(R.id.btnclsadding);
+                        lvproductsavailable = (ListView) dialogViewaddspecials.findViewById(R.id.lvproductsavailable);
+                        dtefrom = (EditText) dialogViewaddspecials.findViewById(R.id.dtefrom);
+                        edtdtefromTo = (EditText) dialogViewaddspecials.findViewById(R.id.edtdtefrom);
+                        edtsellingprice = (EditText) dialogViewaddspecials.findViewById(R.id.edtsellingprice);
+                        searchproduct = (EditText) dialogViewaddspecials.findViewById(R.id.searchproduct);
+                        prodname = (TextView) dialogViewaddspecials.findViewById(R.id.prodname);
+                        productcode = (TextView) dialogViewaddspecials.findViewById(R.id.productcode);
+                        txtcosts = (TextView) dialogViewaddspecials.findViewById(R.id.txtcosts);
+                        etdgp = (TextView) dialogViewaddspecials.findViewById(R.id.textView34);
+                        custcodedialog = (TextView) dialogViewaddspecials.findViewById(R.id.custcodedialog);
+                        acceptablegp = (TextView) dialogViewaddspecials.findViewById(R.id.acceptablegp);
+                        specialheader = (TextView) dialogViewaddspecials.findViewById(R.id.specialheader);
+                        acceptablegp.setText("0");
+                        Long tsLong = System.currentTimeMillis() / 1000;
+                        String ts = tsLong.toString();
+                        subscriberId = ts + "-" + android.provider.Settings.Secure.getString(getContentResolver(), android.provider.Settings.Secure.ANDROID_ID);
+                        Calendar c = Calendar.getInstance();
+                        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+                        String tm = sdf.format(c.getTime());
+                        dtefrom.setText(tm);
+                        edtdtefromTo.setText(tm);
+                        custcodedialog.setText(custcode.getText().toString());
 
 
-                                    if(!txtcosts.getText().equals("Cost") && edtsellingprice.getText().toString().length() > 0 )
-                                    {
+                        returnProducts("");
+
+                        dtefrom.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+                                final Calendar cldr = Calendar.getInstance();
+                                int day = cldr.get(Calendar.DAY_OF_MONTH);
+                                int month = cldr.get(Calendar.MONTH);
+                                int year = cldr.get(Calendar.YEAR);
+                                // date picker dialog
+                                pickeraddspecialfrom = new DatePickerDialog(CustomersActivity.this,
+                                        new DatePickerDialog.OnDateSetListener() {
+                                            @Override
+                                            public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
+                                                dtefrom.setText(year + "-" + (monthOfYear + 1) + "-" + dayOfMonth);
+                                            }
+                                        }, year, month, day);
+                                pickeraddspecialfrom.show();
+                            }
+                        });
+                        edtdtefromTo.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+                                final Calendar cldr = Calendar.getInstance();
+                                int day = cldr.get(Calendar.DAY_OF_MONTH);
+                                int month = cldr.get(Calendar.MONTH);
+                                int year = cldr.get(Calendar.YEAR);
+                                // date picker dialog
+                                pickeraddspecialTo = new DatePickerDialog(CustomersActivity.this,
+                                        new DatePickerDialog.OnDateSetListener() {
+                                            @Override
+                                            public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
+                                                edtdtefromTo.setText(year + "-" + (monthOfYear + 1) + "-" + dayOfMonth);
+                                            }
+                                        }, year, month, day);
+                                pickeraddspecialTo.show();
+                            }
+                        });
+                        btnsearch.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+                                returnProducts(searchproduct.getText().toString());
+                            }
+                        });
+                        btnclsadding.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+                                dialogViewaddspecials.dismiss();
+                            }
+                        });
+                        btnsavespecial.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+
+
+                                if (!txtcosts.getText().equals("Cost") && edtsellingprice.getText().toString().length() > 0) {
                                       /* if(marginCalculator(Double.parseDouble(txtcosts.getText().toString()) ,Double.parseDouble(edtsellingprice.getText().toString())) < Double.parseDouble(acceptablegp.getText().toString())){
                                            AlertDialog.Builder builder = new AlertDialog.Builder(CustomersActivity.this);
                                            builder.setMessage("Below Acceptable Product GP%")
@@ -982,45 +988,43 @@ public class CustomersActivity extends AppCompatActivity {
                                            alert.show();
 
                                        }else{*/
-                                           new AddCustomerSpecials().execute();
-                                       //}
+                                    new AddCustomerSpecials().execute();
+                                    //}
 
-                                    }
-                                    else
-                                    {
-                                        Toast.makeText(CustomersActivity.this, " Make sure you have entered the price.", Toast.LENGTH_LONG).show();
-                                    }
-
+                                } else {
+                                    Toast.makeText(CustomersActivity.this, " Make sure you have entered the price.", Toast.LENGTH_LONG).show();
                                 }
-                            });
-                            lvproductsavailable.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                                @Override
-                                public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                                    Item    selectedItem2 = (Item)(adapterView.getItemAtPosition(i));
-                                    prodname.setText(selectedItem2.ItemString2);
-                                    productcode.setText(selectedItem2.ItemString);
-                                    txtcosts.setText(selectedItem2.ItemString3);
-                                    acceptablegp.setText(selectedItem2.ItemString4);
 
-                                    etdgp.setOnLongClickListener(new View.OnLongClickListener() {
-                                        @Override
-                                        public boolean onLongClick(View view) {
-                                            if(edtsellingprice.getText().toString().length() > 0){
-                                                etdgp.setText(""+String.format("%.2f", marginCalculator(Double.parseDouble(txtcosts.getText().toString()) ,Double.parseDouble(edtsellingprice.getText().toString()))) +"%");
+                            }
+                        });
+                        lvproductsavailable.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                            @Override
+                            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                                Item selectedItem2 = (Item) (adapterView.getItemAtPosition(i));
+                                prodname.setText(selectedItem2.ItemString2);
+                                productcode.setText(selectedItem2.ItemString);
+                                txtcosts.setText(selectedItem2.ItemString3);
+                                acceptablegp.setText(selectedItem2.ItemString4);
 
-                                            }else{
-                                                Toast.makeText(CustomersActivity.this, " No Selling Price.", Toast.LENGTH_LONG).show();
-                                            }
-                                            return false;
+                                etdgp.setOnLongClickListener(new View.OnLongClickListener() {
+                                    @Override
+                                    public boolean onLongClick(View view) {
+                                        if (edtsellingprice.getText().toString().length() > 0) {
+                                            etdgp.setText("" + String.format("%.2f", marginCalculator(Double.parseDouble(txtcosts.getText().toString()), Double.parseDouble(edtsellingprice.getText().toString()))) + "%");
+
+                                        } else {
+                                            Toast.makeText(CustomersActivity.this, " No Selling Price.", Toast.LENGTH_LONG).show();
                                         }
-                                    });
+                                        return false;
+                                    }
+                                });
 
-                                }
-                            });
-                            dialogViewaddspecials.show();
+                            }
+                        });
+                        dialogViewaddspecials.show();
 
-                        }
-                    });
+                    }
+                });
 
 
                 dialogView.show();
@@ -1049,12 +1053,13 @@ public class CustomersActivity extends AppCompatActivity {
             }
         });
     }
+
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
-        if(keyCode== KeyEvent.KEYCODE_BACK) {
-            Intent myIntent = new Intent(CustomersActivity.this,HomeScreen.class);
-            myIntent.putExtra("userID",userID);
-            myIntent.putExtra("roles",roles);
+        if (keyCode == KeyEvent.KEYCODE_BACK) {
+            Intent myIntent = new Intent(CustomersActivity.this, HomeScreen.class);
+            myIntent.putExtra("userID", userID);
+            myIntent.putExtra("roles", roles);
             startActivity(myIntent);
 
 
@@ -1062,44 +1067,45 @@ public class CustomersActivity extends AppCompatActivity {
         }
         return super.onKeyDown(keyCode, event);
     }
-    public double marginCalculator(double cost,double onCellVal)
-    {
-        return (1-(cost/onCellVal))*100;
+
+    public double marginCalculator(double cost, double onCellVal) {
+        return (1 - (cost / onCellVal)) * 100;
 
 
     }
+
     @SuppressLint("Range")
-    public int casecount(String ID)
-    {
-        int caseC =0;
-        Cursor cursor2 = dbOrders.rawQuery("SELECT sum(Quantity) Quantity from OrderLines where ID ='"+ID+"' ", null);
+    public int casecount(String ID) {
+        int caseC = 0;
+        Cursor cursor2 = dbOrders.rawQuery("SELECT sum(Quantity) Quantity from OrderLines where ID ='" + ID + "' ", null);
 
         if (cursor2.moveToFirst()) {
             do {
-                caseC =cursor2.getInt(cursor2.getColumnIndex("Quantity"));
+                caseC = cursor2.getInt(cursor2.getColumnIndex("Quantity"));
 
             } while (cursor2.moveToNext());
         }
 
         return caseC;
     }
-    public double returnItemGP(String productCode)
-    {
-        double costs =0;
-        Cursor cursor2 = db.rawQuery("SELECT gptolerance from Products where strPartNumber ='"+productCode+"' limit 1", null);
+
+    public double returnItemGP(String productCode) {
+        double costs = 0;
+        Cursor cursor2 = db.rawQuery("SELECT gptolerance from Products where strPartNumber ='" + productCode + "' limit 1", null);
 
         if (cursor2.moveToFirst()) {
             do {
 
-                costs =cursor2.getDouble(cursor2.getColumnIndex("gptolerance"));Log.e("gptolerance","gptolerance**************"+costs);
+                costs = cursor2.getDouble(cursor2.getColumnIndex("gptolerance"));
+                Log.e("gptolerance", "gptolerance**************" + costs);
 
             } while (cursor2.moveToNext());
         }
 
         return costs;
     }
-    public void returnProducts(String prodName)
-    {
+
+    public void returnProducts(String prodName) {
         startProgress("Please Wait!");
         items1 = new ArrayList<Item>();
         Cursor cursor = db.rawQuery("SELECT Products.strDesc,Products.strPartNumber,Products.Cost,Tax, gptolerance FROM Products   WHERE strDesc like '%" + prodName + "%' order by [strDesc] limit 100", null);
@@ -1107,8 +1113,8 @@ public class CustomersActivity extends AppCompatActivity {
         if (cursor.moveToFirst()) {
             do {
 
-                Item listItem = new Item( cursor.getString(cursor.getColumnIndex("strPartNumber")),cursor.getString(cursor.getColumnIndex("strDesc")),
-                         cursor.getString(cursor.getColumnIndex("Cost")),cursor.getString(cursor.getColumnIndex("gptolerance")));
+                Item listItem = new Item(cursor.getString(cursor.getColumnIndex("strPartNumber")), cursor.getString(cursor.getColumnIndex("strDesc")),
+                        cursor.getString(cursor.getColumnIndex("Cost")), cursor.getString(cursor.getColumnIndex("gptolerance")));
                 items1.add(listItem);
 
             } while (cursor.moveToNext());
@@ -1120,29 +1126,29 @@ public class CustomersActivity extends AppCompatActivity {
         //textTotalBasedProduct.setText(returnTotals(subscriberId)) ;
 
     }
-    public void getProducts(String Products)
-    {
+
+    public void getProducts(String Products) {
 
         items1 = new ArrayList<Item>();
         Cursor cursor = db.rawQuery("Select CustomerSpecialsLines.strPartNumber,CustomerSpecialsLines.strDesc,Products.Cost,Price,CustomerSpecial from CustomerSpecialsLines " +
-                " inner join Products on Products.strPartNumber =CustomerSpecialsLines.strPartNumber  where CustomerId ='"+custcode.getText().toString()+"' and CustomerSpecialsLines.strDesc like '%" + Products + "%' order by CustomerSpecialsLines.strDesc", null);
+                " inner join Products on Products.strPartNumber =CustomerSpecialsLines.strPartNumber  where CustomerId ='" + custcode.getText().toString() + "' and CustomerSpecialsLines.strDesc like '%" + Products + "%' order by CustomerSpecialsLines.strDesc", null);
 
         if (cursor.moveToFirst()) {
             do {
 
-                Item listItem = new Item( "( "+cursor.getString(cursor.getColumnIndex("strPartNumber"))+" ) "+cursor.getString(cursor.getColumnIndex("strDesc")),
-                        "Price "+ cursor.getString(cursor.getColumnIndex("Price"))+" Cost "+ cursor.getString(cursor.getColumnIndex("Cost")), cursor.getString(cursor.getColumnIndex("CustomerSpecial")),"" );
+                Item listItem = new Item("( " + cursor.getString(cursor.getColumnIndex("strPartNumber")) + " ) " + cursor.getString(cursor.getColumnIndex("strDesc")),
+                        "Price " + cursor.getString(cursor.getColumnIndex("Price")) + " Cost " + cursor.getString(cursor.getColumnIndex("Cost")), cursor.getString(cursor.getColumnIndex("CustomerSpecial")), "");
                 items1.add(listItem);
 
             } while (cursor.moveToNext());
         }
 
     }
-    public void getProductsSpecialToEdit(String specialID)
-    {
+
+    public void getProductsSpecialToEdit(String specialID) {
 
         Cursor cursor = db.rawQuery("Select CustomerSpecialsLines.strPartNumber,CustomerSpecialsLines.strDesc,Products.Cost,Price,CustomerSpecial,DateFrom,DateTo from CustomerSpecialsLines " +
-                " inner join Products on Products.strPartNumber =CustomerSpecialsLines.strPartNumber  where CustomerSpecial ='"+specialID+"'", null);
+                " inner join Products on Products.strPartNumber =CustomerSpecialsLines.strPartNumber  where CustomerSpecial ='" + specialID + "'", null);
 
         if (cursor.moveToFirst()) {
             do {
@@ -1157,99 +1163,100 @@ public class CustomersActivity extends AppCompatActivity {
             } while (cursor.moveToNext());
         }
     }
-    public  boolean checkConnection() {
+
+    public boolean checkConnection() {
         // get Connectivity Manager object to check connection
         ConnectivityManager connec
-                =(ConnectivityManager)getSystemService(getBaseContext().CONNECTIVITY_SERVICE);
+                = (ConnectivityManager) getSystemService(getBaseContext().CONNECTIVITY_SERVICE);
 
         // Check for network connections
-        if ( connec.getNetworkInfo(0).getState() ==
+        if (connec.getNetworkInfo(0).getState() ==
                 android.net.NetworkInfo.State.CONNECTED ||
                 connec.getNetworkInfo(0).getState() ==
                         android.net.NetworkInfo.State.CONNECTING ||
                 connec.getNetworkInfo(1).getState() ==
                         android.net.NetworkInfo.State.CONNECTING ||
-                connec.getNetworkInfo(1).getState() == android.net.NetworkInfo.State.CONNECTED ) {
+                connec.getNetworkInfo(1).getState() == android.net.NetworkInfo.State.CONNECTED) {
             Toast.makeText(this, " Connected ", Toast.LENGTH_LONG).show();
             return true;
-        }else if (
+        } else if (
                 connec.getNetworkInfo(0).getState() ==
                         android.net.NetworkInfo.State.DISCONNECTED ||
                         connec.getNetworkInfo(1).getState() ==
-                                android.net.NetworkInfo.State.DISCONNECTED  ) {
+                                android.net.NetworkInfo.State.DISCONNECTED) {
             Toast.makeText(this, " Not Connected ", Toast.LENGTH_LONG).show();
             return false;
         }
         return false;
     }
-    public void getTodaysOrders()
-    {
+
+    public void getTodaysOrders() {
 
         Calendar c = Calendar.getInstance();
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-        String tm =  sdf.format(c.getTime());
-Log.e("tm","********tm*****************"+tm);
+        String tm = sdf.format(c.getTime());
+        Log.e("tm", "********tm*****************" + tm);
         itemstodayorders = new ArrayList<ItemCustomerHistory>();
         //Cursor cursor = dbOrders.rawQuery("select * from OrderHeaders   where OrderDate='"+tm+"' and Complete = 1" ,null);
-        Cursor cursor = dbOrders.rawQuery("select * from OrderHeaders where Complete = 1 order by OrderHeaderAutoID desc Limit 50" ,null);
-        String isQuotation="Order";
-        String OrderID="Order";
+        Cursor cursor = dbOrders.rawQuery("select * from OrderHeaders where Complete = 1 order by OrderHeaderAutoID desc Limit 50", null);
+        String isQuotation = "Order";
+        String OrderID = "Order";
 
         if (cursor.moveToFirst()) {
             do {
 
-                Log.e("tm","********tm*****************"+cursor.getString(cursor.getColumnIndex("isQuotation")));
-                if(cursor.getInt(cursor.getColumnIndex("isQuotation")) == 1){
+                Log.e("tm", "********tm*****************" + cursor.getString(cursor.getColumnIndex("isQuotation")));
+                if (cursor.getInt(cursor.getColumnIndex("isQuotation")) == 1) {
                     isQuotation = "Quote";
                 }
                 OrderID = cursor.getString(cursor.getColumnIndex("OrderID"));
-                @SuppressLint("Range") ItemCustomerHistory listItem = new ItemCustomerHistory(  cursor.getString(cursor.getColumnIndex("StoreName"))+"\n Case Count: "+casecount(cursor.getString(cursor.getColumnIndex("ID"))),cursor.getString(cursor.getColumnIndex("OrderNumber")) ,
-                       cursor.getString(cursor.getColumnIndex("DeliveryDate"))+"\n"+isQuotation+"\n"+OrderID, ""+cursor.getInt(cursor.getColumnIndex("Uploaded")),cursor.getString(cursor.getColumnIndex("ID")));
+                @SuppressLint("Range") ItemCustomerHistory listItem = new ItemCustomerHistory(cursor.getString(cursor.getColumnIndex("StoreName")) + "\n Case Count: " + casecount(cursor.getString(cursor.getColumnIndex("ID"))), cursor.getString(cursor.getColumnIndex("OrderNumber")),
+                        cursor.getString(cursor.getColumnIndex("DeliveryDate")) + "\n" + isQuotation + "\n" + OrderID, "" + cursor.getInt(cursor.getColumnIndex("Uploaded")), cursor.getString(cursor.getColumnIndex("ID")));
                 itemstodayorders.add(listItem);
 
             } while (cursor.moveToNext());
         }
 
     }
-    public void getTodaysOrdersErrors()
-    {
+
+    public void getTodaysOrdersErrors() {
 
         Calendar c = Calendar.getInstance();
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-        String tm =  sdf.format(c.getTime());
-        Log.e("tm","********tm*****************"+tm);
+        String tm = sdf.format(c.getTime());
+        Log.e("tm", "********tm*****************" + tm);
         itemstodayorders = new ArrayList<ItemCustomerHistory>();
         //Cursor cursor = dbOrders.rawQuery("select * from OrderHeaders   where OrderDate='"+tm+"' and Complete = 1" ,null);
-        Cursor cursor = dbOrders.rawQuery("select * from OrderHeaders where Complete = 1 and Uploaded = 0 order by OrderHeaderAutoID desc Limit 50" ,null);
-        String isQuotation="Order";
-        String OrderID="Order";
+        Cursor cursor = dbOrders.rawQuery("select * from OrderHeaders where Complete = 1 and Uploaded = 0 order by OrderHeaderAutoID desc Limit 50", null);
+        String isQuotation = "Order";
+        String OrderID = "Order";
 
         if (cursor.moveToFirst()) {
             do {
 
-                Log.e("tm","********tm*****************"+cursor.getString(cursor.getColumnIndex("isQuotation")));
-                if(cursor.getInt(cursor.getColumnIndex("isQuotation")) == 1){
+                Log.e("tm", "********tm*****************" + cursor.getString(cursor.getColumnIndex("isQuotation")));
+                if (cursor.getInt(cursor.getColumnIndex("isQuotation")) == 1) {
                     isQuotation = "Quote";
                 }
                 OrderID = cursor.getString(cursor.getColumnIndex("OrderID"));
-                @SuppressLint("Range") ItemCustomerHistory listItem = new ItemCustomerHistory(  cursor.getString(cursor.getColumnIndex("StoreName"))+"\n Case Count: "+casecount(cursor.getString(cursor.getColumnIndex("ID"))),cursor.getString(cursor.getColumnIndex("OrderNumber")) ,
-                        cursor.getString(cursor.getColumnIndex("DeliveryDate"))+"\n"+isQuotation+"\n"+OrderID, ""+cursor.getInt(cursor.getColumnIndex("Uploaded")),cursor.getString(cursor.getColumnIndex("ID")));
+                @SuppressLint("Range") ItemCustomerHistory listItem = new ItemCustomerHistory(cursor.getString(cursor.getColumnIndex("StoreName")) + "\n Case Count: " + casecount(cursor.getString(cursor.getColumnIndex("ID"))), cursor.getString(cursor.getColumnIndex("OrderNumber")),
+                        cursor.getString(cursor.getColumnIndex("DeliveryDate")) + "\n" + isQuotation + "\n" + OrderID, "" + cursor.getInt(cursor.getColumnIndex("Uploaded")), cursor.getString(cursor.getColumnIndex("ID")));
                 itemstodayorders.add(listItem);
 
             } while (cursor.moveToNext());
         }
 
     }
-    public void getTodaysOrdersLines(String ID)
-    {
+
+    public void getTodaysOrdersLines(String ID) {
 
         itemLinesselected = new ArrayList<ItemCustomerHistory>();
-        Cursor cursor = dbOrders.rawQuery("select OrderLines.strDesc,OrderLines.Price,OrderLines.Quantity,OrderLines.strPartNumber,OrderHeaders.Uploaded from OrderLines inner join OrderHeaders on OrderHeaders.ID= OrderLines.ID  where OrderLines.ID='"+ID+"'  " ,null);
+        Cursor cursor = dbOrders.rawQuery("select OrderLines.strDesc,OrderLines.Price,OrderLines.Quantity,OrderLines.strPartNumber,OrderHeaders.Uploaded from OrderLines inner join OrderHeaders on OrderHeaders.ID= OrderLines.ID  where OrderLines.ID='" + ID + "'  ", null);
 
         if (cursor.moveToFirst()) {
             do {
-                @SuppressLint("Range") ItemCustomerHistory listItem = new ItemCustomerHistory(  cursor.getString(cursor.getColumnIndex("strDesc")),cursor.getString(cursor.getColumnIndex("Price"))+"\n "+cursor.getString(cursor.getColumnIndex("Quantity")) ,
-                       "", ""+cursor.getInt(cursor.getColumnIndex("Uploaded")),cursor.getString(cursor.getColumnIndex("strPartNumber")));
+                @SuppressLint("Range") ItemCustomerHistory listItem = new ItemCustomerHistory(cursor.getString(cursor.getColumnIndex("strDesc")), cursor.getString(cursor.getColumnIndex("Price")) + "\n " + cursor.getString(cursor.getColumnIndex("Quantity")),
+                        "", "" + cursor.getInt(cursor.getColumnIndex("Uploaded")), cursor.getString(cursor.getColumnIndex("strPartNumber")));
                 itemLinesselected.add(listItem);
 
             } while (cursor.moveToNext());
@@ -1257,22 +1264,22 @@ Log.e("tm","********tm*****************"+tm);
         myItemOrdersAdapterSelected = new ItemsListAdapterOrders(CustomersActivity.this, itemLinesselected);
 
     }
-    public String getInvoiceNo(String ID)
-    {
+
+    public String getInvoiceNo(String ID) {
         String NoInv = "NO INVOICE";
-        Cursor cursor = dbOrders.rawQuery("select OrderID from OrderHeaders where ID='"+ID+"' and (OrderID != '' or OrderID is not null or OrderID !='null' )  limit 1", null);
+        Cursor cursor = dbOrders.rawQuery("select OrderID from OrderHeaders where ID='" + ID + "' and (OrderID != '' or OrderID is not null or OrderID !='null' )  limit 1", null);
         if (cursor.moveToFirst()) {
             do {
 
-                NoInv=  cursor.getString(cursor.getColumnIndex("OrderID"));
+                NoInv = cursor.getString(cursor.getColumnIndex("OrderID"));
 
             } while (cursor.moveToNext());
         }
 
         return NoInv;
     }
-    public int countSpecials()
-    {
+
+    public int countSpecials() {
         Cursor c = db.rawQuery("select strPartNumber from CustomerSpecialsLines ", null);
         return c.getCount();
 
@@ -1291,17 +1298,16 @@ Log.e("tm","********tm*****************"+tm);
         if (c.moveToFirst()) {
             do {
                 String s = "zz";
-                if(c.getString(nameIndex).length() > 0)
-                {
+                if (c.getString(nameIndex).length() > 0) {
                     s = c.getString(nameIndex);
                 }
 
-                String contacts = c.getString(c.getColumnIndex("CustomerContactTelephone"))+" "+c.getString(c.getColumnIndex("CustomerContactCellphone"));
+                String contacts = c.getString(c.getColumnIndex("CustomerContactTelephone")) + " " + c.getString(c.getColumnIndex("CustomerContactCellphone"));
                 stringArrayList.add(s.substring(0, 1));
                 String s3 = c.getString(nameIndex2);
-                Item item = new Item(s, s3,contacts,"");
+                Item item = new Item(s, s3, contacts, "");
                 items1.add(item);
-                Log.e("contacts","contacts**********************"+contacts);
+                Log.e("contacts", "contacts**********************" + contacts);
             } while (c.moveToNext());
         }
 
@@ -1319,8 +1325,8 @@ Log.e("tm","********tm*****************"+tm);
         //letters.close();
         //db.close();
     }
-    public void lazyScrolllastId(int lastId)
-    {
+
+    public void lazyScrolllastId(int lastId) {
 
        /* Cursor cursor2 = db.rawQuery("SELECT * from Customers where id>"+lastId+" ", null);
 
@@ -1335,8 +1341,7 @@ Log.e("tm","********tm*****************"+tm);
 
     }
 
-    public String XmlTemplate()
-    {
+    public String XmlTemplate() {
 
 
         String Xml = "<Lines>" +
@@ -1349,6 +1354,7 @@ Log.e("tm","********tm*****************"+tm);
 
     private class UploadNewOrderLinesDetails extends AsyncTask<Void, Void, Void> {
         String id;
+
         @Override
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
@@ -1367,35 +1373,35 @@ Log.e("tm","********tm*****************"+tm);
             //}
             int count = 0;
             HttpPost httppost = new HttpPost(IP + "PostLinesNew.php");
-            Log.e("PostOrderLines","PostOrderLines----------******************"+IP + "PostLinesNew.php");
+            Log.e("PostOrderLines", "PostOrderLines----------******************" + IP + "PostLinesNew.php");
             try {
                 // Add your data
 
-                Cursor cursorh = dbOrders.rawQuery("SELECT * from OrderHeaders where Uploaded=0 and ID='"+id+"' limit 1", null);
+                Cursor cursorh = dbOrders.rawQuery("SELECT * from OrderHeaders where Uploaded=0 and ID='" + id + "' limit 1", null);
                 String header = "";
 
                 if (cursorh.moveToFirst()) {
                     do {
-                      //  header += "<Headers><ID>"+cursorh.getString(cursorh.getColumnIndex("ID"))+"</ID><CustomerCode>"+cursorh.getString(cursorh.getColumnIndex("CustomerCode"))+"</CustomerCode><DeliveryDate>"+cursorh.getString(cursorh.getColumnIndex("DeliveryDate"))+"</DeliveryDate><UserID>"+getPasswordByName()+"</UserID><Quote>"+cursorh.getInt(cursorh.getColumnIndex("isQuotation"))+"</Quote><DeliveryAddressID>"+cursorh.getInt(cursorh.getColumnIndex("DeliveryAddressID"))+"</DeliveryAddressID><Onum>"+cursorh.getString(cursorh.getColumnIndex("OrderNumber"))+"</Onum>";
-                        header += "<Headers><ID>"+cursorh.getString(cursorh.getColumnIndex("ID"))+"</ID><CustomerCode>"+cursorh.getString(cursorh.getColumnIndex("CustomerCode"))+"</CustomerCode><DeliveryDate>"+cursorh.getString(cursorh.getColumnIndex("DeliveryDate"))+"</DeliveryDate><UserID>"+getPasswordByName()+"</UserID><Quote>"+cursorh.getInt(cursorh.getColumnIndex("isQuotation"))+"</Quote><DeliveryAddressID>"+cursorh.getInt(cursorh.getColumnIndex("DeliveryAddressID"))+"</DeliveryAddressID><Onum>"+cursorh.getString(cursorh.getColumnIndex("OrderNumber"))+"</Onum><notes>"+cursorh.getString(cursorh.getColumnIndex("Notes"))+"</notes><Coordinates>"+cursorh.getString(cursorh.getColumnIndex("Coordinates"))+"</Coordinates>";
+                        //  header += "<Headers><ID>"+cursorh.getString(cursorh.getColumnIndex("ID"))+"</ID><CustomerCode>"+cursorh.getString(cursorh.getColumnIndex("CustomerCode"))+"</CustomerCode><DeliveryDate>"+cursorh.getString(cursorh.getColumnIndex("DeliveryDate"))+"</DeliveryDate><UserID>"+getPasswordByName()+"</UserID><Quote>"+cursorh.getInt(cursorh.getColumnIndex("isQuotation"))+"</Quote><DeliveryAddressID>"+cursorh.getInt(cursorh.getColumnIndex("DeliveryAddressID"))+"</DeliveryAddressID><Onum>"+cursorh.getString(cursorh.getColumnIndex("OrderNumber"))+"</Onum>";
+                        header += "<Headers><ID>" + cursorh.getString(cursorh.getColumnIndex("ID")) + "</ID><CustomerCode>" + cursorh.getString(cursorh.getColumnIndex("CustomerCode")) + "</CustomerCode><DeliveryDate>" + cursorh.getString(cursorh.getColumnIndex("DeliveryDate")) + "</DeliveryDate><UserID>" + getPasswordByName() + "</UserID><Quote>" + cursorh.getInt(cursorh.getColumnIndex("isQuotation")) + "</Quote><DeliveryAddressID>" + cursorh.getInt(cursorh.getColumnIndex("DeliveryAddressID")) + "</DeliveryAddressID><Onum>" + cursorh.getString(cursorh.getColumnIndex("OrderNumber")) + "</Onum><notes>" + cursorh.getString(cursorh.getColumnIndex("Notes")) + "</notes><Coordinates>" + cursorh.getString(cursorh.getColumnIndex("Coordinates")) + "</Coordinates>";
                     } while (cursorh.moveToNext());
                 }
 
-                Cursor cursor2 = dbOrders.rawQuery("SELECT * from OrderLines where Uploaded = 0 and ID='"+id+"'", null);
+                Cursor cursor2 = dbOrders.rawQuery("SELECT * from OrderLines where Uploaded = 0 and ID='" + id + "'", null);
                 JSONArray jsonArray = new JSONArray();
                 String xml = "";
 
                 if (cursor2.moveToFirst()) {
                     do {
                         xml += XmlTemplate().toString()
-                                .replace("unik",cursor2.getString(cursor2.getColumnIndex("strPartNumber")))
-                                .replace("moola",""+ cursor2.getString(cursor2.getColumnIndex("Price")))
-                                .replace("palo",""+cursor2.getString(cursor2.getColumnIndex("Quantity")));
+                                .replace("unik", cursor2.getString(cursor2.getColumnIndex("strPartNumber")))
+                                .replace("moola", "" + cursor2.getString(cursor2.getColumnIndex("Price")))
+                                .replace("palo", "" + cursor2.getString(cursor2.getColumnIndex("Quantity")));
                     } while (cursor2.moveToNext());
                 }
 
                 String footer = "</Headers>";
-                jsonArray.put( header+xml+footer);
+                jsonArray.put(header + xml + footer);
 
                 JSONObject finalInfo = new JSONObject();
                 finalInfo.put("jsonobject", jsonArray);
@@ -1410,7 +1416,7 @@ Log.e("tm","********tm*****************"+tm);
                 // Execute HTTP Post Request
                 org.apache.http.HttpResponse response = httpclient.execute(httppost);
                 String responseBody = EntityUtils.toString(response.getEntity());
-                responseBody =  responseBody.replaceAll("\"", "");
+                responseBody = responseBody.replaceAll("\"", "");
                 Log.e("JSON-*", "RESPONSE is lines**: " + responseBody);   //The response
                 //Log.e("OrderLinesAutoId", "UPDATE  OrderLines SET Uploaded = 1 where OrderLinesAutoId in( " + responseBody + ")");
                 //JSONArray BoardInfo = new JSONArray(responseBody);
@@ -1420,14 +1426,13 @@ Log.e("tm","********tm*****************"+tm);
                 for (int j = 0; j < BoardInfo.length(); ++j) {
 
                     JSONObject BoardDetails = BoardInfo.getJSONObject(j);
-                    String ID ;
+                    String ID;
 
                     OrderId = BoardDetails.getString("OrderId").toString();
                     Result = BoardDetails.getString("Result");
                     ID = BoardDetails.getString("ID");
 
-                    if(Result.equals("SUCCESS"))
-                    {
+                    if (Result.equals("SUCCESS")) {
                         dbOrders.execSQL("UPDATE  OrderLines SET Uploaded = 1 where ID in(' " + ID + "')");
                         dbOrders.execSQL("UPDATE  OrderHeaders SET Uploaded = 1 where ID in( '" + ID + "')");
 
@@ -1437,48 +1442,42 @@ Log.e("tm","********tm*****************"+tm);
                     }
                 }
 
-                if(Result.equals("SUCCESS"))
-                {
+                if (Result.equals("SUCCESS")) {
                     //db.execSQL("Update StockTakeLines set blnScanned=0  where blnScanned = 1 ");
                     //    db.execSQL("Delete from  StockTakeLines ");
                     progressDoalog.dismiss();
 
-                    new Thread()
-                    {
-                        public void run()
-                        {
-                            CustomersActivity.this.runOnUiThread(new Runnable()
-                            {
-                                public void run()
-                                {
+                    new Thread() {
+                        public void run() {
+                            CustomersActivity.this.runOnUiThread(new Runnable() {
+                                public void run() {
                                     //Do your UI operations like dialog opening or Toast here
 
-                                    final  AlertDialog.Builder dialogll = new  AlertDialog.Builder(CustomersActivity.this);
+                                    final AlertDialog.Builder dialogll = new AlertDialog.Builder(CustomersActivity.this);
                                     dialogll.setTitle("POST")
                                             .setMessage("Your Records Posted Successfully.")
                                             .setNegativeButton("Done Done", new DialogInterface.OnClickListener() {
                                                 @Override
                                                 public void onClick(DialogInterface paramDialogInterface, int paramInt) {
                                                     //db.execSQL("delete from StockTakeLines");
-                                                    Intent i = new Intent(CustomersActivity.this,CustomersActivity.class);
-                                                    i.putExtra("userID",getPasswordByName());
-                                                    i.putExtra("roles","");
+                                                    Intent i = new Intent(CustomersActivity.this, CustomersActivity.class);
+                                                    i.putExtra("userID", getPasswordByName());
+                                                    i.putExtra("roles", "");
                                                     startActivity(i);
                                                 }
                                             }).setPositiveButton("View Transaction", new DialogInterface.OnClickListener() {
-                                        @Override
-                                        public void onClick(DialogInterface paramDialogInterface, int paramInt) {
-                                            //db.execSQL("delete from StockTakeLines");
-                                            Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(DimsIp+"pdforder/"+OrderId));
-                                            startActivity(browserIntent);
-                                        }
-                                    });
+                                                @Override
+                                                public void onClick(DialogInterface paramDialogInterface, int paramInt) {
+                                                    //db.execSQL("delete from StockTakeLines");
+                                                    Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(DimsIp + "pdforder/" + OrderId));
+                                                    startActivity(browserIntent);
+                                                }
+                                            });
                                     dialogll.show();
                                 }
                             });
                         }
                     }.start();
-
 
 
                 }
@@ -1497,6 +1496,7 @@ Log.e("tm","********tm*****************"+tm);
 
     private class UpdateCustomerSpecials extends AsyncTask<Void, Void, Void> {
         String specialId;
+
         @Override
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
@@ -1515,7 +1515,7 @@ Log.e("tm","********tm*****************"+tm);
             //}
             int count = 0;
             HttpPost httppost = new HttpPost(IP + "UpdateCustomerSpecials.php");
-            Log.e("UpdateCustomerSpecials","UpdateCustomerSpecials----------******************");
+            Log.e("UpdateCustomerSpecials", "UpdateCustomerSpecials----------******************");
             try {
                 // Add your data
                 JSONArray jsonArray = new JSONArray();
@@ -1525,8 +1525,8 @@ Log.e("tm","********tm*****************"+tm);
                 json.put("fltcosts", fltcosts.getText().toString());
                 json.put("eddatefrom", eddatefrom.getText().toString());
                 json.put("dteto", dteto.getText().toString());
-                json.put("specialId",specialId);
-                json.put("userid",getPasswordByName());
+                json.put("specialId", specialId);
+                json.put("userid", getPasswordByName());
 
                 jsonArray.put(json);
                 count++;
@@ -1543,16 +1543,16 @@ Log.e("tm","********tm*****************"+tm);
                 // Execute HTTP Post Request
                 org.apache.http.HttpResponse response = httpclient.execute(httppost);
                 String responseBody = EntityUtils.toString(response.getEntity());
-                responseBody =  responseBody.replaceAll("\"", "");
+                responseBody = responseBody.replaceAll("\"", "");
 
-                Log.e("response","***"+responseBody);
+                Log.e("response", "***" + responseBody);
 
                /* ContentValues cv = new ContentValues();
                 cv.put("Price", selingprice.getText().toString());
                 db.update("CustomerSpecialsLines", cv, "CustomerSpecial = ?", new int[]{Integer. parseInt(responseBody)});*/
 
-                db.rawQuery("update CustomerSpecialsLines set Price='"+ selingprice.getText().toString()+"' where CustomerSpecial='"+responseBody+"'",null);
-               // dbH.updateDeals("UPDATE  OrderLines SET Uploaded = 1 where OrderDetailId in( " + responseBody + ")");
+                db.rawQuery("update CustomerSpecialsLines set Price='" + selingprice.getText().toString() + "' where CustomerSpecial='" + responseBody + "'", null);
+                // dbH.updateDeals("UPDATE  OrderLines SET Uploaded = 1 where OrderDetailId in( " + responseBody + ")");
                 dialogViewinner.dismiss();
 
 
@@ -1570,6 +1570,7 @@ Log.e("tm","********tm*****************"+tm);
 
     private class DeleteCustomerSpecial extends AsyncTask<Void, Void, Void> {
         String specialId;
+
         @Override
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
@@ -1588,14 +1589,14 @@ Log.e("tm","********tm*****************"+tm);
             //}
             int count = 0;
             HttpPost httppost = new HttpPost(IP + "DeleteCustomerSpecials.php");
-            Log.e("DeleteCustomerSpecials","DeleteCustomerSpecials----------******************");
+            Log.e("DeleteCustomerSpecials", "DeleteCustomerSpecials----------******************");
             try {
                 // Add your data
                 JSONArray jsonArray = new JSONArray();
                 JSONObject json = new JSONObject();
 
-                json.put("specialId",specialId);
-                json.put("userid",getPasswordByName());
+                json.put("specialId", specialId);
+                json.put("userid", getPasswordByName());
 
                 jsonArray.put(json);
                 count++;
@@ -1614,30 +1615,26 @@ Log.e("tm","********tm*****************"+tm);
                 String responseBody = EntityUtils.toString(response.getEntity());
 
 
-                Log.e("response","***"+responseBody);
+                Log.e("response", "***" + responseBody);
 
                 JSONArray BoardInfo = new JSONArray(responseBody);
 
                 for (int j = 0; j < BoardInfo.length(); ++j) {
 
                     JSONObject BoardDetails = BoardInfo.getJSONObject(j);
-                    String strDesc, strPartNumber,SpecialHeaderId,DateFrom,DateTo,Price,CustomerId,CustomerSpecial;
+                    String strDesc, strPartNumber, SpecialHeaderId, DateFrom, DateTo, Price, CustomerId, CustomerSpecial;
 
 
                     CustomerSpecial = BoardDetails.getString("specials");
 
-                    String[] whereArgs = new String[] { String.valueOf(CustomerSpecial) };
+                    String[] whereArgs = new String[]{String.valueOf(CustomerSpecial)};
                     db.delete("CustomerSpecialsLines", "CustomerSpecial=?", whereArgs);
 
 
-                    new Thread()
-                    {
-                        public void run()
-                        {
-                            CustomersActivity.this.runOnUiThread(new Runnable()
-                            {
-                                public void run()
-                                {
+                    new Thread() {
+                        public void run() {
+                            CustomersActivity.this.runOnUiThread(new Runnable() {
+                                public void run() {
                                     AlertDialog.Builder builder = new AlertDialog.Builder(CustomersActivity.this);
                                     builder.setMessage(" Transaction Deleted Successfully")
                                             .setCancelable(false)
@@ -1659,7 +1656,6 @@ Log.e("tm","********tm*****************"+tm);
                 }
 
 
-
             } catch (ClientProtocolException e) {
                 Log.e("JSON", e.getMessage());
             } catch (IOException e) {
@@ -1671,6 +1667,7 @@ Log.e("tm","********tm*****************"+tm);
             return null;
         }
     }
+
     private class AddCustomerSpecials extends AsyncTask<Void, Void, Void> {
 
         @Override
@@ -1691,7 +1688,7 @@ Log.e("tm","********tm*****************"+tm);
             //}
             int count = 0;
             HttpPost httppost = new HttpPost(IP + "CreateCustomerSpecials.php");
-            Log.e("CreateCustomerSpecials","CreateCustomerSpecials----------******************");
+            Log.e("CreateCustomerSpecials", "CreateCustomerSpecials----------******************");
             try {
                 // Add your data
                 JSONArray jsonArray = new JSONArray();
@@ -1705,7 +1702,7 @@ Log.e("tm","********tm*****************"+tm);
                 json.put("eddatefrom", dtefrom.getText().toString());
                 json.put("dteto", edtdtefromTo.getText().toString());
                 json.put("subscriberId", subscriberId);
-                json.put("userid",getPasswordByName());
+                json.put("userid", getPasswordByName());
 
                 jsonArray.put(json);
                 count++;
@@ -1724,14 +1721,14 @@ Log.e("tm","********tm*****************"+tm);
                 String responseBody = EntityUtils.toString(response.getEntity());
 
 
-                Log.e("response","***"+responseBody);
+                Log.e("response", "***" + responseBody);
 
                 JSONArray BoardInfo = new JSONArray(responseBody);
 
                 for (int j = 0; j < BoardInfo.length(); ++j) {
 
                     JSONObject BoardDetails = BoardInfo.getJSONObject(j);
-                    String strDesc, strPartNumber,SpecialHeaderId,DateFrom,DateTo,Price,CustomerId,CustomerSpecial;
+                    String strDesc, strPartNumber, SpecialHeaderId, DateFrom, DateTo, Price, CustomerId, CustomerSpecial;
 
                     strDesc = BoardDetails.getString("strDesc");
                     strPartNumber = BoardDetails.getString("strPartNumber");
@@ -1746,36 +1743,32 @@ Log.e("tm","********tm*****************"+tm);
                     cv.put("strDesc", strDesc);
                     cv.put("strPartNumber", strPartNumber);
                     cv.put("SpecialHeaderId", Integer.parseInt(SpecialHeaderId));
-                    cv.put("DateFrom",DateFrom);
+                    cv.put("DateFrom", DateFrom);
                     cv.put("DateTo", DateTo);
-                    cv.put("Price", Double.parseDouble(Price) );
+                    cv.put("Price", Double.parseDouble(Price));
                     cv.put("CustomerId", CustomerId);
                     cv.put("Added", 0);
-                    cv.put("CustomerSpecial",Integer.parseInt(CustomerSpecial) );
+                    cv.put("CustomerSpecial", Integer.parseInt(CustomerSpecial));
 
                     db.insert("CustomerSpecialsLines", null, cv);
-                    new Thread()
-                    {
-                        public void run()
-                        {
-                            CustomersActivity.this.runOnUiThread(new Runnable()
-                            {
-                                public void run()
-                                {
-                    AlertDialog.Builder builder = new AlertDialog.Builder(CustomersActivity.this);
-                    builder.setMessage(" Transaction Posted Successfully")
-                            .setCancelable(false)
+                    new Thread() {
+                        public void run() {
+                            CustomersActivity.this.runOnUiThread(new Runnable() {
+                                public void run() {
+                                    AlertDialog.Builder builder = new AlertDialog.Builder(CustomersActivity.this);
+                                    builder.setMessage(" Transaction Posted Successfully")
+                                            .setCancelable(false)
 
-                            .setPositiveButton("Okay", new DialogInterface.OnClickListener() {
-                                public void onClick(DialogInterface dialog, int id) {
-                                    edtsellingprice.setText("");
-                                    txtcosts.setText("Costs");
-                                    dialog.dismiss();
-                                }
-                            })
-                    ;
-                    AlertDialog alert = builder.create();
-                    alert.show();
+                                            .setPositiveButton("Okay", new DialogInterface.OnClickListener() {
+                                                public void onClick(DialogInterface dialog, int id) {
+                                                    edtsellingprice.setText("");
+                                                    txtcosts.setText("Costs");
+                                                    dialog.dismiss();
+                                                }
+                                            })
+                                    ;
+                                    AlertDialog alert = builder.create();
+                                    alert.show();
                                 }
                             });
                         }
@@ -1800,15 +1793,14 @@ Log.e("tm","********tm*****************"+tm);
     }
 
 
-
     public String getPasswordByName() {
 
-        String password ="";
+        String password = "";
         Cursor cursor2 = dbOrders.rawQuery("SELECT * from LoggedIn limit 1", null);
 
         if (cursor2.moveToFirst()) {
             do {
-                password =cursor2.getString(cursor2.getColumnIndex("UserID"));
+                password = cursor2.getString(cursor2.getColumnIndex("UserID"));
 
             } while (cursor2.moveToNext());
         }
@@ -1818,17 +1810,17 @@ Log.e("tm","********tm*****************"+tm);
     }
 
 
-    public void startProgress(String msg)
-    {
+    public void startProgress(String msg) {
         progressDoalog = new ProgressDialog(CustomersActivity.this);
         progressDoalog.setMax(100);
-        progressDoalog.setMessage("Please Wait...."+msg);
+        progressDoalog.setMessage("Please Wait...." + msg);
         progressDoalog.setTitle("Doing some work for you.");
         progressDoalog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
         progressDoalog.setCanceledOnTouchOutside(false);
         progressDoalog.show();
     }
-    public int CheckIfMerchie(){
+
+    public int CheckIfMerchie() {
         Cursor cursor2 = dbOrders.rawQuery("SELECT *  from BriefcaseRoles where RoleDescription ='Merchie'", null);
         return cursor2.getCount();
     }

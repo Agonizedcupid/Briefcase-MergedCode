@@ -7,6 +7,7 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -71,7 +72,7 @@ import pk.codebase.requests.HttpError;
 import pk.codebase.requests.HttpRequest;
 import pk.codebase.requests.HttpResponse;
 
-public class LoginActivity extends AppCompatActivity implements View.OnClickListener{
+public class LoginActivity extends AppCompatActivity implements View.OnClickListener {
 
     public class Item {
 
@@ -81,7 +82,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         String ItemString4;
 
 
-        Item(String t, String t2, String t3,String t4) {
+        Item(String t, String t2, String t3, String t4) {
             ItemString = t;
             ItemString2 = t2;
             ItemString3 = t3;
@@ -152,22 +153,28 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     List<Item> items1, items3AlphaList;
     ItemsListAdapter myItemsListAdapter1;
 
-    Button btnregister,logInBtn;
-    TextView theVersion,one,two,three,four,five,six,seven,eight,nine,backspace,clear,submit,hello,version;
+    Button btnregister, logInBtn;
+    TextView theVersion, one, two, three, four, five, six, seven, eight, nine, backspace, clear, submit, hello, version;
     ListView lv;
-    EditText mPasswordField,userNameEditText,pinCodeEditText;
+    EditText mPasswordField, userNameEditText, pinCodeEditText;
     //private String userPin,userID,IP="http://groceryexpress.ddns.net:8181/LoadScan/";
-    private String userPin,userID,IP="http://102.37.0.48/Briefcase/",Locations="1",roles,urlLogins = "http://102.37.0.48/BriefcaseCommonCloud/";
-   // private DatabaseHelper mDatabaseHelper;
+    private String userPin, userID, IP = "http://102.37.0.48/Briefcase/", Locations = "1", roles, urlLogins = "http://102.37.0.48/BriefcaseCommonCloud/";
+    // private DatabaseHelper mDatabaseHelper;
     final MyRawQueryHelper dbH = new MyRawQueryHelper(AppApplication.getAppContext());
-    private SQLiteDatabase db,dbOrders;
+    private SQLiteDatabase db, dbOrders;
     final private int REQUEST_CODE_ASK_PERMISSIONS = 123;
     final static int Conn = 333;
+
+    SharedPreferences sharedPreferences;
+    SharedPreferences.Editor editor;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_loginregister);
+
+        sharedPreferences = getSharedPreferences("IP_FILE", MODE_PRIVATE);
+        editor = sharedPreferences.edit();
 
         /*if (Build.VERSION.SDK_INT >= 23) {
             int hasLocationPermissions = checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE);
@@ -177,39 +184,39 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                 return;
             }
         }*/
-           // File file = new File("Salesmanbriefcase");
+        // File file = new File("Salesmanbriefcase");
 
-           // final String dir =   Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS) +"/";
-            db = this.openOrCreateDatabase( getApplicationContext().getFilesDir()+"/LinxBriefcaseDB.db", SQLiteDatabase.CREATE_IF_NECESSARY, null);
-
-
-           // final String dir2 = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS) + "/";
-            dbOrders = this.openOrCreateDatabase( getApplicationContext().getFilesDir()+"/LinxBriefcaseOrders.db", SQLiteDatabase.CREATE_IF_NECESSARY, null);
-
-            //Creating empty tables
-            db.execSQL("CREATE TABLE IF NOT EXISTS Customers  (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL)");
-            db.execSQL("CREATE TABLE IF NOT EXISTS Products  (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL)");
-            db.execSQL("CREATE TABLE IF NOT EXISTS CustomerPriceLists  (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL)");
-            db.execSQL("CREATE TABLE IF NOT EXISTS CustomerSpecialsLines  (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL)");
-            db.execSQL("CREATE TABLE IF NOT EXISTS GroupSpecialsLines  (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL)");
-            db.execSQL("CREATE TABLE IF NOT EXISTS OrderPattern  (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL)");
-            db.execSQL("CREATE TABLE IF NOT EXISTS DeliveryAddress  (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL)");
-            db.execSQL("CREATE TABLE IF NOT EXISTS Users  (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL)");
+        // final String dir =   Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS) +"/";
+        db = this.openOrCreateDatabase(getApplicationContext().getFilesDir() + "/LinxBriefcaseDB.db", SQLiteDatabase.CREATE_IF_NECESSARY, null);
 
 
-            dbOrders.execSQL("CREATE TABLE IF NOT EXISTS Users  (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,UserID INTEGER,UserName TEXT,UserPin TEXT ,UserRole TEXT)");
-            dbOrders.execSQL("CREATE TABLE IF NOT EXISTS CustomerNotes (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,UserID INTEGER,CustomerCode TEXT,Notes TEXT ,Coordinates TEXT)");
-            db.execSQL("CREATE TABLE IF NOT EXISTS tblSettings  (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,Location TEXT NOT NULL DEFAULT  '1',IP TEXT ,DimsIp TEXT )");
-            dbOrders.execSQL("CREATE TABLE IF NOT EXISTS tblSettings  (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,IP TEXT,DimsIp TEXT  )");
-            dbOrders.execSQL("CREATE TABLE IF NOT EXISTS LoggedIn  (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,UserID INTEGER,LastDate TEXT)");
-            dbOrders.execSQL("CREATE TABLE IF NOT EXISTS BriefcaseRoles(id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,UserID INTEGER,RoleID INTEGER,RoleDescription TEXT)");
+        // final String dir2 = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS) + "/";
+        dbOrders = this.openOrCreateDatabase(getApplicationContext().getFilesDir() + "/LinxBriefcaseOrders.db", SQLiteDatabase.CREATE_IF_NECESSARY, null);
 
-            dbOrders.execSQL("CREATE TABLE IF NOT EXISTS OrderHeaders (ID TEXT, OrderDate Text , DeliveryDate TEXT,OrderNumber TEXT,CustomerCode TEXT,CustomerDesc TEXT, Notes TEXT,DimsOrderId TEXT, UserID INT,DeliveryAddressID INT,Complete BOOLEAN,Uploaded BOOLEAN,LinesUploaded BOOLEAN,OrderType INTEGER,OrderHeaderAutoID INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,isQuotation Boolean DEFAULT 0,StoreName TEXT,OrderID TEXT,Coordinates TEXT)");
-            dbOrders.execSQL("CREATE TABLE IF NOT EXISTS OrderLines  (ID TEXT, strPartNumber TEXT ,strDesc TEXT, Quantity DECIMAL,Price DECIMAL, Vat DECIMAL, Authorised BOOLEAN Default 0,Uploaded BOOLEAN,PriceInclusive DECIMAL,Uom TEXT ,LineTotalPriceInclusive DECIMAL,OrderLinesAutoId INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,Cost Decimal,CustomerCode TEXT,LineDeliveryDate TEXT,StoreName TEXT )");
+        //Creating empty tables
+        db.execSQL("CREATE TABLE IF NOT EXISTS Customers  (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL)");
+        db.execSQL("CREATE TABLE IF NOT EXISTS Products  (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL)");
+        db.execSQL("CREATE TABLE IF NOT EXISTS CustomerPriceLists  (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL)");
+        db.execSQL("CREATE TABLE IF NOT EXISTS CustomerSpecialsLines  (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL)");
+        db.execSQL("CREATE TABLE IF NOT EXISTS GroupSpecialsLines  (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL)");
+        db.execSQL("CREATE TABLE IF NOT EXISTS OrderPattern  (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL)");
+        db.execSQL("CREATE TABLE IF NOT EXISTS DeliveryAddress  (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL)");
+        db.execSQL("CREATE TABLE IF NOT EXISTS Users  (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL)");
 
-            dbOrders.execSQL("CREATE TABLE IF NOT EXISTS Visits  (ID TEXT, CustomerCode TEXT ,nextvisit TEXT, Lat TEXT,Lon TEXT, answeroneid TEXT," +
-                    " answeronetext TEXT,answertwoid TEXT,answertwotext TEXT,answerthreeid TEXT ,answerthreetext TEXT,customersatisfactoyanswer TEXT,userid TEXT,catchupnotes TEXT," +
-                    "notes TEXT )");
+
+        dbOrders.execSQL("CREATE TABLE IF NOT EXISTS Users  (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,UserID INTEGER,UserName TEXT,UserPin TEXT ,UserRole TEXT)");
+        dbOrders.execSQL("CREATE TABLE IF NOT EXISTS CustomerNotes (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,UserID INTEGER,CustomerCode TEXT,Notes TEXT ,Coordinates TEXT)");
+        db.execSQL("CREATE TABLE IF NOT EXISTS tblSettings  (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,Location TEXT NOT NULL DEFAULT  '1',IP TEXT ,DimsIp TEXT )");
+        dbOrders.execSQL("CREATE TABLE IF NOT EXISTS tblSettings  (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,IP TEXT,DimsIp TEXT  )");
+        dbOrders.execSQL("CREATE TABLE IF NOT EXISTS LoggedIn  (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,UserID INTEGER,LastDate TEXT)");
+        dbOrders.execSQL("CREATE TABLE IF NOT EXISTS BriefcaseRoles(id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,UserID INTEGER,RoleID INTEGER,RoleDescription TEXT)");
+
+        dbOrders.execSQL("CREATE TABLE IF NOT EXISTS OrderHeaders (ID TEXT, OrderDate Text , DeliveryDate TEXT,OrderNumber TEXT,CustomerCode TEXT,CustomerDesc TEXT, Notes TEXT,DimsOrderId TEXT, UserID INT,DeliveryAddressID INT,Complete BOOLEAN,Uploaded BOOLEAN,LinesUploaded BOOLEAN,OrderType INTEGER,OrderHeaderAutoID INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,isQuotation Boolean DEFAULT 0,StoreName TEXT,OrderID TEXT,Coordinates TEXT)");
+        dbOrders.execSQL("CREATE TABLE IF NOT EXISTS OrderLines  (ID TEXT, strPartNumber TEXT ,strDesc TEXT, Quantity DECIMAL,Price DECIMAL, Vat DECIMAL, Authorised BOOLEAN Default 0,Uploaded BOOLEAN,PriceInclusive DECIMAL,Uom TEXT ,LineTotalPriceInclusive DECIMAL,OrderLinesAutoId INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,Cost Decimal,CustomerCode TEXT,LineDeliveryDate TEXT,StoreName TEXT )");
+
+        dbOrders.execSQL("CREATE TABLE IF NOT EXISTS Visits  (ID TEXT, CustomerCode TEXT ,nextvisit TEXT, Lat TEXT,Lon TEXT, answeroneid TEXT," +
+                " answeronetext TEXT,answertwoid TEXT,answertwotext TEXT,answerthreeid TEXT ,answerthreetext TEXT,customersatisfactoyanswer TEXT,userid TEXT,catchupnotes TEXT," +
+                "notes TEXT )");
 
 
         Cursor cursorm = dbOrders.rawQuery("SELECT * FROM OrderLines limit 1", null); // grab cursor for all data
@@ -231,8 +238,8 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
             dbOrders.execSQL("ALTER TABLE OrderHeaders ADD COLUMN Coordinates TEXT;");
         }
 
-           Cursor cursor = db.rawQuery("SELECT * from tblSettings", null);
-            //ArrayList<SettingsModel> settIP = dbH.getSettings();
+        Cursor cursor = db.rawQuery("SELECT * from tblSettings", null);
+        //ArrayList<SettingsModel> settIP = dbH.getSettings();
 
         /*if (cursor.moveToFirst()) {
             do {
@@ -242,17 +249,17 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
             } while (cursor.moveToNext());
         }*/
-           // for (SettingsModel orderAttributes : settIP) {
-               // IP = "";//orderAttributes.getstrServerIp();
-                //Locations =""; //orderAttributes.getLocationId();
-           // }
+        // for (SettingsModel orderAttributes : settIP) {
+        // IP = "";//orderAttributes.getstrServerIp();
+        //Locations =""; //orderAttributes.getLocationId();
+        // }
           /*  if (cursor.getCount() < 1) {
                 Intent i = new Intent(LoginActivity.this, RegisterActivity.class);
                 startActivity(i);
             } else {*/
 
-            //}
-               // checkLast();
+        //}
+        // checkLast();
               /* if (checkConnection()) {
                     getUser();
                 } else {
@@ -295,8 +302,8 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                 return;
             }
 
-            login(userNameEditText.getText().toString().trim(),pinCodeEditText.getText().toString().trim());
-           // String password = getPasswordByName(userNameEditText.getText().toString().trim());
+            login(userNameEditText.getText().toString().trim(), pinCodeEditText.getText().toString().trim());
+            // String password = getPasswordByName(userNameEditText.getText().toString().trim());
             //Toast.makeText(this, ""+password, Toast.LENGTH_SHORT).show();
            /* if (password.equals(pinCodeEditText.getText().toString().trim())) {
                 saveUserID(getUserId(userNameEditText.getText().toString().trim()));
@@ -314,14 +321,14 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         btnregister.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent i = new Intent(LoginActivity.this,RegisterActivity.class);
+                Intent i = new Intent(LoginActivity.this, RegisterActivity.class);
                 startActivity(i);
             }
         });
 
 
-
     }
+
     @Override
     public void onClick(View v) {
         // handle number button click
@@ -346,12 +353,11 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
             case R.id.t9_key_clear: {
 
                 String password = mPasswordField.getText().toString();
-                Log.e("PasswordReal","++++++++++++++++++"+password+"**"+userPin);
+                Log.e("PasswordReal", "++++++++++++++++++" + password + "**" + userPin);
                 if (password.equals(userPin)) {
                     Intent intent = new Intent(LoginActivity.this, LoginActivity.class);
                     startActivity(intent);
-                }
-                else{
+                } else {
                     Toast.makeText(LoginActivity.this, "PassWord is Incorrect", Toast.LENGTH_LONG).show();
                 }
             }
@@ -359,37 +365,34 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         }
     }
 
-    private boolean isPermissionsGranted(){
+    private boolean isPermissionsGranted() {
 
-        if(Build.VERSION.SDK_INT == Build.VERSION_CODES.R){
+        if (Build.VERSION.SDK_INT == Build.VERSION_CODES.R) {
             return Environment.isExternalStorageManager();
-        }
-        else
-        {
-            int reatExternalStoragePermission = ContextCompat.checkSelfPermission(this,Manifest.permission.READ_EXTERNAL_STORAGE);
-            int writecheck = ContextCompat.checkSelfPermission(this,Manifest.permission.WRITE_EXTERNAL_STORAGE);
-            return reatExternalStoragePermission == PackageManager.PERMISSION_GRANTED  && writecheck == PackageManager.PERMISSION_GRANTED;
+        } else {
+            int reatExternalStoragePermission = ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE);
+            int writecheck = ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE);
+            return reatExternalStoragePermission == PackageManager.PERMISSION_GRANTED && writecheck == PackageManager.PERMISSION_GRANTED;
 
         }
     }
 
-    private void takePermission(){
-        if(Build.VERSION.SDK_INT == Build.VERSION_CODES.R){
+    private void takePermission() {
+        if (Build.VERSION.SDK_INT == Build.VERSION_CODES.R) {
 
-            try{
+            try {
                 Intent intent = new Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION);
                 intent.addCategory("android.intent.category.DEFAULT");
-                intent.setData(Uri.parse(String.format("package:%s",getApplicationContext().getPackageManager())));
-                startActivityForResult(intent,2000);
-            }catch(Exception exception)
-            {
+                intent.setData(Uri.parse(String.format("package:%s", getApplicationContext().getPackageManager())));
+                startActivityForResult(intent, 2000);
+            } catch (Exception exception) {
                 Intent intent = new Intent();
                 intent.setAction(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION);
-                startActivityForResult(intent,2000);
+                startActivityForResult(intent, 2000);
             }
 
-        }else{
-            ActivityCompat.requestPermissions(this,new String[]{Manifest.permission.READ_EXTERNAL_STORAGE,Manifest.permission.WRITE_EXTERNAL_STORAGE},Conn);
+        } else {
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE}, Conn);
         }
 
     }
@@ -397,15 +400,15 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if(resultCode == RESULT_OK){
-            if(requestCode == 100){
-                    if(Build.VERSION.SDK_INT == Build.VERSION_CODES.R){
-                        if(Environment.isExternalStorageManager()){
-                            Toast.makeText(this,"Permision Granted n android 11",Toast.LENGTH_SHORT).show();
-                        }else{
-                            takePermission();
-                        }
+        if (resultCode == RESULT_OK) {
+            if (requestCode == 100) {
+                if (Build.VERSION.SDK_INT == Build.VERSION_CODES.R) {
+                    if (Environment.isExternalStorageManager()) {
+                        Toast.makeText(this, "Permision Granted n android 11", Toast.LENGTH_SHORT).show();
+                    } else {
+                        takePermission();
                     }
+                }
             }
         }
     }
@@ -414,15 +417,14 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
 
-        switch(requestCode){
+        switch (requestCode) {
             case Conn:
-                if(grantResults.length > 0){
-                    boolean storage =grantResults[0] == PackageManager.PERMISSION_GRANTED;
-                    boolean read =grantResults[1] == PackageManager.PERMISSION_GRANTED;
-                    if (storage && read){
+                if (grantResults.length > 0) {
+                    boolean storage = grantResults[0] == PackageManager.PERMISSION_GRANTED;
+                    boolean read = grantResults[1] == PackageManager.PERMISSION_GRANTED;
+                    if (storage && read) {
                         //
-                    }
-                    else{
+                    } else {
 
                     }
                 }
@@ -441,33 +443,35 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         }
         return false;
     }
-    public  boolean checkConnection() {
+
+    public boolean checkConnection() {
         // get Connectivity Manager object to check connection
         ConnectivityManager connec
-                =(ConnectivityManager)getSystemService(getBaseContext().CONNECTIVITY_SERVICE);
+                = (ConnectivityManager) getSystemService(getBaseContext().CONNECTIVITY_SERVICE);
 
         // Check for network connections
-        if ( connec.getNetworkInfo(0).getState() ==
+        if (connec.getNetworkInfo(0).getState() ==
                 android.net.NetworkInfo.State.CONNECTED ||
                 connec.getNetworkInfo(0).getState() ==
                         android.net.NetworkInfo.State.CONNECTING ||
                 connec.getNetworkInfo(1).getState() ==
                         android.net.NetworkInfo.State.CONNECTING ||
-                connec.getNetworkInfo(1).getState() == android.net.NetworkInfo.State.CONNECTED ) {
+                connec.getNetworkInfo(1).getState() == android.net.NetworkInfo.State.CONNECTED) {
             Toast.makeText(this, " Connected ", Toast.LENGTH_LONG).show();
             return true;
-        }else if (
+        } else if (
                 connec.getNetworkInfo(0).getState() ==
                         android.net.NetworkInfo.State.DISCONNECTED ||
                         connec.getNetworkInfo(1).getState() ==
-                                android.net.NetworkInfo.State.DISCONNECTED  ) {
+                                android.net.NetworkInfo.State.DISCONNECTED) {
             Toast.makeText(this, " Not Connected ", Toast.LENGTH_LONG).show();
             return false;
         }
         return false;
     }
-    public void volleyLogin(String Username, String PinCode){
-        String postUrl = urlLogins+"Users.php";
+
+    public void volleyLogin(String Username, String PinCode) {
+        String postUrl = urlLogins + "Users.php";
         RequestQueue requestQueue = Volley.newRequestQueue(this);
 
         JSONObject postData = new JSONObject();
@@ -482,14 +486,14 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, postUrl, postData, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
-                Log.e("star","Boy***************************************");
-               // Log.e("response","**"+response);
+                Log.e("star", "Boy***************************************");
+                // Log.e("response","**"+response);
                 //checkLast();
             }
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                Log.e("star","***************************************Error Volley");
+                Log.e("star", "***************************************Error Volley");
                 error.printStackTrace();
             }
         });
@@ -497,11 +501,12 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         requestQueue.add(jsonObjectRequest);
 
     }
-    private void login(String Username, String PinCode){
+
+    private void login(String Username, String PinCode) {
         //Getting values from edit texts
         final String email = Username;
         final String password = PinCode;
-        String postUrl = urlLogins+"Users.php";
+        String postUrl = urlLogins + "Users.php";
         final AppApplication globalVariable = (AppApplication) getApplicationContext();
         //Creating a string request
         StringRequest stringRequest = new StringRequest(Request.Method.POST, postUrl,
@@ -509,31 +514,35 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                     @Override
                     public void onResponse(String response) {
 
-                        Log.e("****","Error**************"+response);
+                        Log.e("****", "Error**************" + response);
                         try {
                             JSONArray BoardInfo = new JSONArray(response);
                             dbOrders.execSQL("Drop Table tblSettings");
-                             dbOrders.execSQL("CREATE TABLE IF NOT EXISTS tblSettings  (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,IP TEXT,DimsIp TEXT,DownloadPath TEXT  )");
+                            dbOrders.execSQL("CREATE TABLE IF NOT EXISTS tblSettings  (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,IP TEXT,DimsIp TEXT,DownloadPath TEXT  )");
 
                             for (int j = 0; j < BoardInfo.length(); ++j) {
                                 JSONObject BoardDetails = BoardInfo.getJSONObject(j);
-                                String strIp, strDimsIP,userid, strimage,ismerchie,Location,DownloadPath;
+                                String strIp, strDimsIP, userid, strimage, ismerchie, Location, DownloadPath;
                                 strIp = BoardDetails.getString("strIp");
                                 strDimsIP = BoardDetails.getString("strDimsIP");
                                 userid = BoardDetails.getString("UserId");
                                 strimage = BoardDetails.getString("strImagePath");
                                 ismerchie = BoardDetails.getString("strBriefcaseType");
                                 Location = BoardDetails.getString("LocationId");
-                                DownloadPath = BoardDetails.getString("DownloadPath");
+                                //DownloadPath = BoardDetails.getString("DownloadPath");
+                                DownloadPath = BoardDetails.getString("strDbToDownload");
 
+                                editor.putString("IP", "" + strIp);
+                                editor.putString("ID", "" + userid);
+                                editor.commit();
 
                                 Log.e("JSON-*", "RESPONSE IS HEADERS**: " + strIp);
                                 Log.e("strDimsIP-*", "RESPONSE IS strDimsIP**: " + strDimsIP);
 
                                 ContentValues values = new ContentValues();
-                                values.put("IP",strIp);
-                                values.put("DimsIp",strDimsIP);
-                                values.put("DownloadPath",DownloadPath);
+                                values.put("IP", strIp);
+                                values.put("DimsIp", strDimsIP);
+                                values.put("DownloadPath", DownloadPath);
                                 dbOrders.insert("tblSettings", null, values);
                                 Cursor cursor = dbOrders.rawQuery("SELECT * from tblSettings where DimsIp is not null", null);
                                 if (cursor.moveToFirst()) {
@@ -549,14 +558,14 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                                 globalVariable.setDIMSIP(strDimsIP);
                                 globalVariable.setImages(strimage);
                                 globalVariable.setLocation(Location);
-                                Log.e("IP","*****************************IP"+IP);
+                                Log.e("IP", "*****************************IP" + IP);
 
-                               // checkLast();
-                               // dbH.updateDeals("UPDATE  OrderHeaders SET Uploaded = 1,offloaded =1  where InvoiceNo = '" + ID + "'");
+                                // checkLast();
+                                // dbH.updateDeals("UPDATE  OrderHeaders SET Uploaded = 1,offloaded =1  where InvoiceNo = '" + ID + "'");
 
                                 Calendar c = Calendar.getInstance();
                                 SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-                                String tm =  sdf.format(c.getTime());
+                                String tm = sdf.format(c.getTime());
                              /*   dbOrders.execSQL("DELETE FROM LoggedIn");
                                 ContentValues cv = new ContentValues();
                                 cv.put("UserID", userid);
@@ -568,12 +577,11 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                                 cvmerchies.put("RoleDescription", ismerchie);
                                 dbOrders.insert("BriefcaseRoles", null, cvmerchies);
 
-                                Cursor cursor2 = dbOrders.rawQuery("SELECT * from LoggedIn where LastDate ='"+tm+"'", null);
-                                if(cursor2.getCount() < 1)
-                                {
+                                Cursor cursor2 = dbOrders.rawQuery("SELECT * from LoggedIn where LastDate ='" + tm + "'", null);
+                                if (cursor2.getCount() < 1) {
                                     Intent i = new Intent(LoginActivity.this, ControlPanel.class);
                                     startActivity(i);
-                                }else{
+                                } else {
 
                                     dbOrders.execSQL("DELETE FROM LoggedIn");
                                     ContentValues cv = new ContentValues();
@@ -582,16 +590,16 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                                     dbOrders.insert("LoggedIn", null, cv);
 
 
-                                    Intent i = new Intent(LoginActivity.this,SalesActivity.class);
-                                    i.putExtra("userID",userid);
-                                    i.putExtra("roles","");
-                                    i.putExtra("name",Username);
+                                    Intent i = new Intent(LoginActivity.this, SalesActivity.class);
+                                    i.putExtra("userID", userid);
+                                    i.putExtra("roles", "");
+                                    i.putExtra("name", Username);
                                     startActivity(i);
                                 }
                             }
 
                         } catch (Exception e) {
-                            Log.e("JSON", e.getMessage());
+                            Log.e("ERROR_LOGIN", e.getMessage());
                         }
                         //If we are getting success from server
 
@@ -624,10 +632,10 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                     public void onErrorResponse(VolleyError error) {
                         //You can handle error here if you want
                     }
-                }){
+                }) {
             @Override
             protected Map<String, String> getParams() throws AuthFailureError {
-                Map<String,String> params = new HashMap<>();
+                Map<String, String> params = new HashMap<>();
                 //Adding parameters to request
 
                 params.put("username", Username);
@@ -643,6 +651,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         RequestQueue requestQueue = Volley.newRequestQueue(this);
         requestQueue.add(stringRequest);
     }
+
     public void getUser() {
         HttpRequest request = new HttpRequest();
         items1 = new ArrayList<Item>();
@@ -657,15 +666,15 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                     for (int i = 0; i < jsonArray.length(); i++) {
                         Log.e("users", "------------------------" + jsonArray.getJSONObject(i));
                         JSONObject jsonObject = jsonArray.getJSONObject(i);
-                        Item item = new Item(jsonObject.getString("UserName"), jsonObject.getString("UserID"),jsonObject.getString("UserIdentity"),jsonObject.getString("PinCode")); //
+                        Item item = new Item(jsonObject.getString("UserName"), jsonObject.getString("UserID"), jsonObject.getString("UserIdentity"), jsonObject.getString("PinCode")); //
                         items1.add(item);
 
                         //db.execSQL("CREATE TABLE IF NOT EXISTS Users  (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,UserID INTEGER,UserName TEXT,UserPin TEXT,UserTokenAuth TEXT)");
                         ContentValues values = new ContentValues();
                         values.put("UserID", jsonObject.getString("UserID"));
-                        values.put("UserName",jsonObject.getString("UserName"));
-                        values.put("UserRole",jsonObject.getString("UserIdentity"));
-                        values.put("UserPin",jsonObject.getString("PinCode"));
+                        values.put("UserName", jsonObject.getString("UserName"));
+                        values.put("UserRole", jsonObject.getString("UserIdentity"));
+                        values.put("UserPin", jsonObject.getString("PinCode"));
 
 
                         dbOrders.insert("Users", null, values);
@@ -694,18 +703,18 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                     break;
             }
         });
-        Log.e("locations","***********************"+IP+"Users.php?location="+Locations);
-        request.get(IP+"Users.php?location="+Locations);
+        Log.e("locations", "***********************" + IP + "Users.php?location=" + Locations);
+        request.get(IP + "Users.php?location=" + Locations);
     }
 
     public String getPasswordByName(String name) {
 
-        String password ="";
-        Cursor cursor2 = dbOrders.rawQuery("SELECT * from Users where UserName ='"+name+"'", null);
+        String password = "";
+        Cursor cursor2 = dbOrders.rawQuery("SELECT * from Users where UserName ='" + name + "'", null);
 
         if (cursor2.moveToFirst()) {
             do {
-                password =cursor2.getString(cursor2.getColumnIndex("UserPin"));
+                password = cursor2.getString(cursor2.getColumnIndex("UserPin"));
 
             } while (cursor2.moveToNext());
         }
@@ -716,12 +725,12 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
     public String getUserId(String name) {
 
-        String password ="";
-        Cursor cursor2 = dbOrders.rawQuery("SELECT * from Users where UserName ='"+name+"'", null);
+        String password = "";
+        Cursor cursor2 = dbOrders.rawQuery("SELECT * from Users where UserName ='" + name + "'", null);
 
         if (cursor2.moveToFirst()) {
             do {
-                password =cursor2.getString(cursor2.getColumnIndex("UserID"));
+                password = cursor2.getString(cursor2.getColumnIndex("UserID"));
 
             } while (cursor2.moveToNext());
         }
@@ -729,10 +738,11 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         return password;
 
     }
+
     public void saveUserID(String userid) {
         Calendar c = Calendar.getInstance();
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-        String tm =  sdf.format(c.getTime());
+        String tm = sdf.format(c.getTime());
         dbOrders.execSQL("DELETE FROM LoggedIn");
         ContentValues cv = new ContentValues();
         cv.put("UserID", userid);
@@ -741,14 +751,12 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
     }
 
-    public void checkLast()
-    {
+    public void checkLast() {
         Calendar c = Calendar.getInstance();
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-        String tm =  sdf.format(c.getTime());
-        Cursor cursor2 = dbOrders.rawQuery("SELECT * from LoggedIn where LastDate ='"+tm+"'", null);
-        if(cursor2.getCount() < 1)
-        {
+        String tm = sdf.format(c.getTime());
+        Cursor cursor2 = dbOrders.rawQuery("SELECT * from LoggedIn where LastDate ='" + tm + "'", null);
+        if (cursor2.getCount() < 1) {
             Intent i = new Intent(LoginActivity.this, ControlPanel.class);
             startActivity(i);
         }

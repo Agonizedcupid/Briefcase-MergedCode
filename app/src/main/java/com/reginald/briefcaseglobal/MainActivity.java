@@ -1255,7 +1255,7 @@ public class MainActivity extends AppCompatActivity  {
 
         if (cursor2.moveToFirst()) {
             do {
-                priceListnameReturned =cursor2.getString(cursor2.getColumnIndex("CustomerPriceList"));
+                priceListnameReturned =cursor2.getString(cursor2.getColumnIndexOrThrow("CustomerPriceList"));
 
             } while (cursor2.moveToNext());
         }

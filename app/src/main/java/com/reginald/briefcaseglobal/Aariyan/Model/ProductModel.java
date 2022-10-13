@@ -2,11 +2,11 @@ package com.reginald.briefcaseglobal.Aariyan.Model;
 
 public class ProductModel {
     private String strPartNumber,strDesc,strCategory,Vat,ProductID,strCompanyName;
-    private String Cost;
+    private String Cost, selectedCustomerCode;
 
     public ProductModel() {}
 
-    public ProductModel(String strPartNumber, String strDesc, String strCategory, String vat, String productID, String strCompanyName, String cost) {
+    public ProductModel(String strPartNumber, String strDesc, String strCategory, String vat, String productID, String strCompanyName, String cost, String selectedCustomerCode) {
         this.strPartNumber = strPartNumber;
         this.strDesc = strDesc;
         this.strCategory = strCategory;
@@ -14,6 +14,15 @@ public class ProductModel {
         ProductID = productID;
         this.strCompanyName = strCompanyName;
         Cost = cost;
+        this.selectedCustomerCode = selectedCustomerCode;
+    }
+
+    public String getSelectedCustomerCode() {
+        return selectedCustomerCode;
+    }
+
+    public void setSelectedCustomerCode(String selectedCustomerCode) {
+        this.selectedCustomerCode = selectedCustomerCode;
     }
 
     public String getStrPartNumber() {

@@ -94,7 +94,7 @@
                     android:paddingTop="5dp"
                     android:paddingEnd="10dp"
                     android:paddingBottom="5dp"
-                    android:text="Date From"
+                    android:text="Date To"
                     android:textColor="@android:color/black"
                     app:layout_constraintLeft_toRightOf="@id/dateFromTextView"
                     app:layout_constraintRight_toRightOf="parent"

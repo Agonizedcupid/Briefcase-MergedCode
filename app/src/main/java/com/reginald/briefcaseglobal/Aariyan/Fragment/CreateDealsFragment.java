@@ -1,7 +1,9 @@
 package com.reginald.briefcaseglobal.Aariyan.Fragment;
 
 import android.app.Activity;
+import android.app.DatePickerDialog;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.os.Bundle;
 
@@ -17,18 +19,25 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.os.Handler;
+import android.text.Editable;
+import android.text.TextUtils;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.reginald.briefcaseglobal.Aariyan.Activity.DealsButtonActivity;
 import com.reginald.briefcaseglobal.Aariyan.Adapter.ItemAdapter;
+import com.reginald.briefcaseglobal.Aariyan.Database.DatabaseAdapter;
 import com.reginald.briefcaseglobal.Aariyan.Interface.ClickProduct;
 import com.reginald.briefcaseglobal.Aariyan.Interface.RestApis;
 import com.reginald.briefcaseglobal.Aariyan.Model.ProductModel;
@@ -37,7 +46,9 @@ import com.reginald.briefcaseglobal.Network.APIs;
 import com.reginald.briefcaseglobal.Network.ApiClient;
 import com.reginald.briefcaseglobal.R;
 
+import java.util.Calendar;
 import java.util.List;
+import java.util.Locale;
 
 public class CreateDealsFragment extends Fragment implements View.OnClickListener, ClickProduct {
 
@@ -57,11 +68,30 @@ public class CreateDealsFragment extends Fragment implements View.OnClickListene
     BottomSheetBehavior<View> behavior;
     BottomSheetDialog dialog;
     View bottomSheetView;
+    ItemAdapter itemAdapter;
+
+    private ProgressBar progressBar;
 
     private static String BASE_URL = "http://102.37.0.48/NewBriefcaseTradePort/";
-    private String code = "SA005"; // Hard coded from Postman:
+    //private String code = "SA005"; // Hard coded from Postman:
+
+    String userID, code, ipURL;
+
+    private DatabaseAdapter databaseAdapter;
 
     private ProductViewModel viewModel;
+
+    private DatePickerDialog datePickerDialog;
+    private Calendar calendar;
+    int day, month, year;
+    String date = "";
+
+    private String costForGP = "0.0";
+
+    private String selectedDateFrom = "0", selectedDateTo = "0";
+
+    SharedPreferences sharedPreferences;
+    private SharedPreferences.Editor editor;
 
     @Override
     public void onAttach(@NonNull Context context) {
@@ -85,7 +115,7 @@ public class CreateDealsFragment extends Fragment implements View.OnClickListene
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View root =  inflater.inflate(R.layout.fragment_create_deals, container, false);
+        View root = inflater.inflate(R.layout.fragment_create_deals, container, false);
         return root;
     }
 
@@ -93,7 +123,10 @@ public class CreateDealsFragment extends Fragment implements View.OnClickListene
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-
+        databaseAdapter = new DatabaseAdapter(activity);
+        sharedPreferences = activity.getSharedPreferences("IP_FILE", Context.MODE_PRIVATE);
+        ;
+        editor = sharedPreferences.edit();
 
         transactionId = view.findViewById(R.id.transactionId);
         customerCode = view.findViewById(R.id.customerCode);
@@ -115,6 +148,12 @@ public class CreateDealsFragment extends Fragment implements View.OnClickListene
     }
 
     private void initializeBottomSheet() {
+
+        calendar = Calendar.getInstance();
+        day = calendar.get(Calendar.DAY_OF_MONTH);
+        month = calendar.get(Calendar.MONTH);
+        year = calendar.get(Calendar.YEAR);
+
         dialog = new BottomSheetDialog(activity);
         bottomSheetView = LayoutInflater.from(activity).inflate(R.layout.available_items_layout, null);
 
@@ -152,17 +191,54 @@ public class CreateDealsFragment extends Fragment implements View.OnClickListene
             }
         });
 
+        progressBar = bottomSheetView.findViewById(R.id.pBar);
+
         dialog.setContentView(bottomSheetView);
 
         //behavior:
         behavior = BottomSheetBehavior.from((View) bottomSheetView.getParent());
+
+        searchBar.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                String search = String.valueOf(s);
+                if (!search.equals("")) {
+                    itemAdapter.getFilter().filter(search);
+                } else {
+
+                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
+            }
+        });
     }
 
     @Override
     public void onResume() {
         super.onResume();
+        ipURL = sharedPreferences.getString("IP", BASE_URL);
+        userID = sharedPreferences.getString("ID", "SA005");
+        code = sharedPreferences.getString("CODE", "SA005");
+        customerCode.setText(String.valueOf("" + code));
+        dateFrom.setText(sharedPreferences.getString("from", "Date From"));
+        dateTo.setText(sharedPreferences.getString("to", "Date To"));
+
+        if (!sharedPreferences.getString("from", "Date From").equals("Date From")
+                && !sharedPreferences.getString("to", "Date To").equals("Date To")) {
+            selectedDateFrom = sharedPreferences.getString("from", "Date From");
+            selectedDateTo = sharedPreferences.getString("to", "Date To");
+        }
+
         // loading related will be there:
-        RestApis apiService = ApiClient.getClient(BASE_URL).create(RestApis.class);
+        RestApis apiService = ApiClient.getClient(ipURL).create(RestApis.class);
         loadProduct(apiService);
 
     }
@@ -170,13 +246,17 @@ public class CreateDealsFragment extends Fragment implements View.OnClickListene
     private void loadProduct(RestApis apiService) {
         ClickProduct clickProduct = this;
         viewModel = new ViewModelProvider(this).get(ProductViewModel.class);
-        viewModel.init(apiService, code);
+        //viewModel.init(apiService, code, databaseAdapter);
+        //Testing:
+        viewModel.init(apiService, "SA005", databaseAdapter);
         viewModel.getListOfProducts().observe(activity, new Observer<List<ProductModel>>() {
             @Override
             public void onChanged(List<ProductModel> productModels) {
-                ItemAdapter adapter = new ItemAdapter(activity, productModels, clickProduct);
-                itemToBeSelectedList.setAdapter(adapter);
-                adapter.notifyDataSetChanged();
+                itemAdapter = new ItemAdapter(activity, productModels, clickProduct);
+                itemToBeSelectedList.setAdapter(itemAdapter);
+                itemAdapter.notifyDataSetChanged();
+
+                progressBar.setVisibility(View.GONE);
             }
         });
     }
@@ -197,10 +277,93 @@ public class CreateDealsFragment extends Fragment implements View.OnClickListene
         int id = v.getId();
         switch (id) {
             case R.id.addItemsBtn:
-                // create Bottom Sheet:
-                showBottomDialogWithData();
+                if (!selectedDateFrom.equals("0") && !selectedDateTo.equals("0")) {
+                    progressBar.setVisibility(View.VISIBLE);
+                    // create Bottom Sheet:
+                    showBottomDialogWithData();
+                } else {
+                    Toast.makeText(activity, "Please select date first!", Toast.LENGTH_SHORT).show();
+                }
                 break;
+            case R.id.dateFromTextView:
+                showDatePicker("from");
+                break;
+
+            case R.id.dateToTextView:
+                showDatePicker("to");
+                break;
+            case R.id.saveDate:
+                if (!selectedDateFrom.equals("0") && !selectedDateTo.equals("0")) {
+                    editor.putString("from", selectedDateFrom);
+                    editor.putString("to", selectedDateTo);
+                    editor.commit();
+                } else {
+                    Toast.makeText(activity, "Select a date first!", Toast.LENGTH_SHORT).show();
+                }
+
+                break;
+
+            case R.id.gpBtn:
+                if (TextUtils.isEmpty(sellingPrice.getText().toString().trim()) || sellingPrice.getText().toString().equals("")) {
+                    Toast.makeText(activity, "Please Enter Selling price first!", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                if (!TextUtils.isEmpty(sellingPrice.getText().toString().trim()) || !costForGP.equals("0.0")) {
+                    gpTextView.setText(String.valueOf("" + marginCalculator(costForGP, sellingPrice.getText().toString().toLowerCase(Locale.ROOT))));
+                    workOnBottomTextView();
+                    break;
+                }
+
         }
+    }
+
+    private void workOnBottomTextView() {
+        bottomLayout.setVisibility(View.VISIBLE);
+        finalPrice.setText(String.valueOf("" + sellingPrice.getText().toString().trim()));
+        dateShowing.setText(String.valueOf("From: " + selectedDateFrom + "\nTO: " + selectedDateTo));
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                finishBtnInBottomSheet.setVisibility(View.VISIBLE);
+            }
+        }, 1000);
+    }
+
+    public double marginCalculator(String cost, String userInputPrice) {
+        return (1 - (Double.parseDouble(cost) / Double.parseDouble(userInputPrice))) * 100;
+    }
+
+    private void showDatePicker(String identifier) {
+
+        datePickerDialog = new DatePickerDialog(activity, new DatePickerDialog.OnDateSetListener() {
+            @Override
+            public void onDateSet(DatePicker datePicker, int i, int i1, int i2) {
+
+                //Month
+                int j = i1 + 1;
+
+                //date = i + "-" + j + "-" + i2;
+                //date = i2 + "-" + j + "-" + i;
+                date = i + "-" + j + "-" + i2;
+                //2022-1-15
+                if (identifier.equals("from")) {
+                    selectedDateFrom = date;
+                    dateFrom.setText(date);
+                } else {
+                    selectedDateTo = date;
+                    dateTo.setText(date);
+                }
+
+
+            }
+            //}, day, month, year);
+        }, calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH));
+
+        //datePickerDialog.getDatePicker().setMinDate(System.currentTimeMillis() - 1000);
+//        new DatePickerDialog(AddTimeActivity.this, null, calendar.get(Calendar.YEAR),
+//                calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH)).show();
+
+        datePickerDialog.show();
     }
 
     private void showBottomDialogWithData() {
@@ -216,12 +379,14 @@ public class CreateDealsFragment extends Fragment implements View.OnClickListene
     public void carryModel(ProductModel model) {
         selectedItemLayout.setVisibility(View.VISIBLE);
         dividerTwo.setVisibility(View.VISIBLE);
-
-        new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                bottomLayout.setVisibility(View.VISIBLE);
-            }
-        },2000);
+        costForGP = model.getCost();
+        afterSelectedName.setText(String.valueOf("ITEM SELECTED, NAME: " + model.getStrDesc()));
+        afterSelectedCost.setText(String.valueOf("ITEM COST: " + model.getCost()));
+//        new Handler().postDelayed(new Runnable() {
+//            @Override
+//            public void run() {
+//                bottomLayout.setVisibility(View.VISIBLE);
+//            }
+//        },2000);
     }
 }

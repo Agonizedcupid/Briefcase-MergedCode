@@ -3,7 +3,9 @@ package com.reginald.briefcaseglobal.Aariyan.Activity;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.SavedStateHandle;
 
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
@@ -20,13 +22,16 @@ public class DealsButtonActivity extends AppCompatActivity {
     private BottomNavigationView bottomNavigationView;
     private TextView toolbarTitle;
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_deals_button);
 
+
         intUI();
     }
+
 
     private void intUI() {
 //        findViewById(R.id.createDeals).setOnClickListener(new View.OnClickListener() {
