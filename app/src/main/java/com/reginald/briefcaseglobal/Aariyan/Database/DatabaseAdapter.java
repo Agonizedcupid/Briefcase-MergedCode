@@ -10,6 +10,7 @@ import android.util.Log;
 import androidx.annotation.Nullable;
 
 import com.reginald.briefcaseglobal.Aariyan.Model.DealHeaderModel;
+import com.reginald.briefcaseglobal.Aariyan.Model.HeadersModel;
 import com.reginald.briefcaseglobal.Aariyan.Model.ProductModel;
 
 import java.util.ArrayList;
@@ -44,17 +45,20 @@ public class DatabaseAdapter {
     }
 
 
-    public long insertDealsHeaders(DealHeaderModel model) {
+    public long insertDealsHeaders(HeadersModel model) {
         SQLiteDatabase database = helper.getWritableDatabase();
 
         ContentValues contentValues = new ContentValues();
-        contentValues.put(DatabaseHelper.transactionID, model.getTransactionID());
+        contentValues.put(DatabaseHelper.transactionID, model.getTransactionId());
         contentValues.put(DatabaseHelper.customerCode, model.getCustomerCode());
         contentValues.put(DatabaseHelper.dateFrom, model.getDateFrom());
         contentValues.put(DatabaseHelper.dateTo, model.getDateTo());
         contentValues.put(DatabaseHelper.userId, model.getUserId());
         contentValues.put(DatabaseHelper.isCompleted, model.getIsCompleted());
         contentValues.put(DatabaseHelper.isUploaded, model.getIsUploaded());
+        contentValues.put(DatabaseHelper.productName, model.getProductName());
+        contentValues.put(DatabaseHelper.productPrice, model.getProductPrice());
+        contentValues.put(DatabaseHelper.productCode, model.getProductCode());
 
         long id = database.insert(DatabaseHelper.DEALS_HEADERS_TABLE_NAME, null, contentValues);
         return id;
@@ -214,6 +218,9 @@ public class DatabaseAdapter {
         private static final String userId = "userId";
         private static final String isCompleted = "isCompleted";
         private static final String isUploaded = "isUploaded";
+        private static final String productName = "productName";
+        private static final String productPrice = "productPrice";
+        private static final String productCode = "productCode";
 
         //Creating the table:
         private static final String CREATE_DEALS_HEADERS_TABLE = "CREATE TABLE " + DEALS_HEADERS_TABLE_NAME
@@ -224,7 +231,11 @@ public class DatabaseAdapter {
                 + dateTo + " VARCHAR(255),"
                 + userId + " VARCHAR(255),"
                 + isCompleted + " INTEGER,"
-                + isUploaded + " INTEGER);";
+                + isUploaded + " INTEGER,"
+                + productName + " VARCHAR(255),"
+                + productPrice + " VARCHAR(255),"
+                + productCode + " VARCHAR(255));";
+
         private static final String DROP_DEALS_HEADERS_TABLE = "DROP TABLE IF EXISTS " + DEALS_HEADERS_TABLE_NAME;
 
 

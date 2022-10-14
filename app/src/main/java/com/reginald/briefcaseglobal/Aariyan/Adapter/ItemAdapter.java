@@ -15,6 +15,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.reginald.briefcaseglobal.Aariyan.Interface.ClickProduct;
+import com.reginald.briefcaseglobal.Aariyan.Model.LinesModel;
 import com.reginald.briefcaseglobal.Aariyan.Model.ProductModel;
 import com.reginald.briefcaseglobal.Aariyan.ViewModel.ProductViewModel;
 import com.reginald.briefcaseglobal.R;

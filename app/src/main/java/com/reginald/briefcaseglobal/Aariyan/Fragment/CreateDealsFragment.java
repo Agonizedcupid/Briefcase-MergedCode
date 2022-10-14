@@ -36,16 +36,21 @@ import android.widget.Toast;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.reginald.briefcaseglobal.Aariyan.Activity.DealsButtonActivity;
+import com.reginald.briefcaseglobal.Aariyan.Adapter.AlreadySelectedItemAdapter;
 import com.reginald.briefcaseglobal.Aariyan.Adapter.ItemAdapter;
 import com.reginald.briefcaseglobal.Aariyan.Database.DatabaseAdapter;
 import com.reginald.briefcaseglobal.Aariyan.Interface.ClickProduct;
+import com.reginald.briefcaseglobal.Aariyan.Interface.ItemSelectionInterface;
 import com.reginald.briefcaseglobal.Aariyan.Interface.RestApis;
+import com.reginald.briefcaseglobal.Aariyan.Model.HeadersModel;
+import com.reginald.briefcaseglobal.Aariyan.Model.LinesModel;
 import com.reginald.briefcaseglobal.Aariyan.Model.ProductModel;
 import com.reginald.briefcaseglobal.Aariyan.ViewModel.ProductViewModel;
 import com.reginald.briefcaseglobal.Network.APIs;
 import com.reginald.briefcaseglobal.Network.ApiClient;
 import com.reginald.briefcaseglobal.R;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
@@ -56,7 +61,7 @@ public class CreateDealsFragment extends Fragment implements View.OnClickListene
 
     private TextView transactionId, customerCode, dateFrom, dateTo;
     private Button saveBtn, finishBtn, addItemBtn;
-    private RecyclerView itemRecyclerViewBtn;
+    private RecyclerView itemRecyclerView;
 
     //Bottom Sheet:
     private ConstraintLayout bottomLayout, selectedItemLayout;
@@ -92,6 +97,14 @@ public class CreateDealsFragment extends Fragment implements View.OnClickListene
 
     SharedPreferences sharedPreferences;
     private SharedPreferences.Editor editor;
+
+    public HeadersModel headersModel;
+    public LinesModel linesModel;
+
+    private List<HeadersModel> listOfHeaders = new ArrayList<>();
+    private List<LinesModel> listOfLines = new ArrayList<>();
+
+    AlreadySelectedItemAdapter alreadySelectedItemAdapter;
 
     @Override
     public void onAttach(@NonNull Context context) {
@@ -141,8 +154,8 @@ public class CreateDealsFragment extends Fragment implements View.OnClickListene
         finishBtn = view.findViewById(R.id.finishBtn);
         finishBtn.setOnClickListener(this);
 
-        itemRecyclerViewBtn = view.findViewById(R.id.itemRecyclerView);
-        itemRecyclerViewBtn.setLayoutManager(new LinearLayoutManager(activity));
+        itemRecyclerView = view.findViewById(R.id.itemRecyclerView);
+        itemRecyclerView.setLayoutManager(new LinearLayoutManager(activity));
 
         initializeBottomSheet();
     }
@@ -237,6 +250,12 @@ public class CreateDealsFragment extends Fragment implements View.OnClickListene
             selectedDateTo = sharedPreferences.getString("to", "Date To");
         }
 
+        if (transactionId().isEmpty() || transactionId().equals("")) {
+            Toast.makeText(activity, "Didn't find Transaction Id!", Toast.LENGTH_SHORT).show();
+        } else {
+            transactionId.setText(String.valueOf("" + transactionId()));
+        }
+
         // loading related will be there:
         RestApis apiService = ApiClient.getClient(ipURL).create(RestApis.class);
         loadProduct(apiService);
@@ -313,8 +332,40 @@ public class CreateDealsFragment extends Fragment implements View.OnClickListene
                     workOnBottomTextView();
                     break;
                 }
+            case R.id.finishButton:
+                fungForSelectedItem();
+                break;
+
+            case R.id.finishBtn:
+                save_N_postDataToLocal_N_Server();
+                break;
 
         }
+    }
+
+    private void save_N_postDataToLocal_N_Server() {
+
+    }
+
+    private void fungForSelectedItem() {
+        if (headersModel != null && linesModel != null) {
+            listOfLines.add(linesModel);
+            listOfHeaders.add(headersModel);
+        }
+
+        //Showing on the recyclerView:
+        alreadySelectedItemAdapter = new AlreadySelectedItemAdapter(activity, listOfHeaders);
+        itemRecyclerView.setAdapter(alreadySelectedItemAdapter);
+        itemRecyclerView.notify();
+        alreadySelectedItemAdapter.notifyDataSetChanged();
+    }
+
+    private String transactionId() {
+        Long tsLong = System.currentTimeMillis() / 1000;
+        String ts = tsLong.toString();
+        String subscriberId = ts + "-" + android.provider.Settings.Secure.getString(activity.getContentResolver(),
+                android.provider.Settings.Secure.ANDROID_ID);
+        return subscriberId;
     }
 
     private void workOnBottomTextView() {
@@ -382,6 +433,27 @@ public class CreateDealsFragment extends Fragment implements View.OnClickListene
         costForGP = model.getCost();
         afterSelectedName.setText(String.valueOf("ITEM SELECTED, NAME: " + model.getStrDesc()));
         afterSelectedCost.setText(String.valueOf("ITEM COST: " + model.getCost()));
+
+
+        //Populating data for saving and posting:
+        headersModel = new HeadersModel(
+                "" + transactionId.getText().toString().trim(),
+                "" + code,
+                "" + selectedDateFrom,
+                "" + selectedDateTo,
+                "" + userID,
+                0, //isCompleted
+                0, //isUploaded
+                "" + model.getStrDesc(),
+                "" + sellingPrice.getText().toString().trim(),
+                "" + model.getStrPartNumber()
+        );
+
+        linesModel = new LinesModel(
+                "" + model.getStrPartNumber(),
+                "" + sellingPrice.getText().toString().trim()
+        );
+
 //        new Handler().postDelayed(new Runnable() {
 //            @Override
 //            public void run() {
@@ -389,4 +461,5 @@ public class CreateDealsFragment extends Fragment implements View.OnClickListene
 //            }
 //        },2000);
     }
+
 }
