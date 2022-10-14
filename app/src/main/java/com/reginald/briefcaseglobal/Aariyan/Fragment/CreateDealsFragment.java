@@ -338,12 +338,15 @@ public class CreateDealsFragment extends Fragment implements View.OnClickListene
                 }
             case R.id.finishButton:
                 fungForSelectedItem();
+                headersModel.setProductPrice(sellingPrice.getText().toString().trim());
+                linesModel.setPrice(sellingPrice.getText().toString().trim());
                 break;
 
             case R.id.finishBtn:
                 saveInLocalDatabase();
                 startActivity(new Intent(activity, SignatureActivity.class)
-                        .putExtra("url", ipURL));
+                        .putExtra("url", ipURL)
+                        .putExtra("tID",""+transactionId.getText().toString().trim()));
                 break;
 
         }
@@ -364,8 +367,9 @@ public class CreateDealsFragment extends Fragment implements View.OnClickListene
         //Showing on the recyclerView:
         alreadySelectedItemAdapter = new AlreadySelectedItemAdapter(activity, listOfHeaders);
         itemRecyclerView.setAdapter(alreadySelectedItemAdapter);
-        itemRecyclerView.notify();
         alreadySelectedItemAdapter.notifyDataSetChanged();
+
+        behavior.setState(BottomSheetBehavior.STATE_HIDDEN);
     }
 
     private String transactionId() {
@@ -442,10 +446,11 @@ public class CreateDealsFragment extends Fragment implements View.OnClickListene
         afterSelectedName.setText(String.valueOf("ITEM SELECTED, NAME: " + model.getStrDesc()));
         afterSelectedCost.setText(String.valueOf("ITEM COST: " + model.getCost()));
 
+        String tID =  transactionId.getText().toString().trim();
 
         //Populating data for saving and posting:
         headersModel = new HeadersModel(
-                "" + transactionId.getText().toString().trim(),
+                "" + tID,
                 "" + code,
                 "" + selectedDateFrom,
                 "" + selectedDateTo,
@@ -457,10 +462,12 @@ public class CreateDealsFragment extends Fragment implements View.OnClickListene
                 "" + model.getStrPartNumber()
         );
 
+
+
         linesModel = new LinesModel(
                 "" + model.getStrPartNumber(),
                 "" + sellingPrice.getText().toString().trim(),
-                transactionId.getText().toString().trim()
+                ""+tID
         );
 
 //        new Handler().postDelayed(new Runnable() {

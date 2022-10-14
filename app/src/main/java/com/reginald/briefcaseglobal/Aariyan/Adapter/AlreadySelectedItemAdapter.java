@@ -39,8 +39,9 @@ public class AlreadySelectedItemAdapter extends RecyclerView.Adapter<AlreadySele
         try {
             holder.itemName.setText(model.getProductName());
             holder.itemPrice.setText(model.getProductPrice());
+            Log.d("ADAPTER_ERROR", ""+model.getProductPrice());
         }catch (Exception e) {
-            Log.d("ADAPTER_ERROR", "onBindViewHolder: ");
+            Log.d("ADAPTER_ERROR", "onBindViewHolder: "+e.getMessage());
         }
 
     }

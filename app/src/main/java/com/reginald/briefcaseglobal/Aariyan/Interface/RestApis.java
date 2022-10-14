@@ -1,5 +1,9 @@
 package com.reginald.briefcaseglobal.Aariyan.Interface;
 
+import com.reginald.briefcaseglobal.Aariyan.Model.SignatureModel;
+
+import java.util.List;
+
 import io.reactivex.rxjava3.core.Observable;
 import okhttp3.ResponseBody;
 import retrofit2.http.Body;
@@ -15,4 +19,7 @@ public interface RestApis {
 
     @POST("PostDealsXmls.php")
     Observable<ResponseBody> postToServer(@Body String xmlData);
+
+    @POST("PostSignatures.php")
+    Observable<ResponseBody> postSignature (@Body List<SignatureModel> signature);
 }

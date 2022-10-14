@@ -22,7 +22,8 @@
         android:theme="@style/Theme.Briefcaseglobal"
         android:usesCleartextTraffic="true">
         <activity
-            android:name=".SignatureActivity"
+            android:name=".Aariyan.Activity.SignatureActivity"
+            android:theme="@style/myTheme"
             android:exported="false" />
         <activity
             android:name=".Aariyan.Activity.DealsButtonActivity"

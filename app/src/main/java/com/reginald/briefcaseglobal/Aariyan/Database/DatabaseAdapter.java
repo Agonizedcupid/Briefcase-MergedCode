@@ -71,6 +71,7 @@ public class DatabaseAdapter {
         ContentValues contentValues = new ContentValues();
         contentValues.put(DatabaseHelper.itemCode, model.getProductCode());
         contentValues.put(DatabaseHelper.itemPrice, model.getPrice());
+        contentValues.put(DatabaseHelper.transactionIdInLines, model.getTransactionId());
 
         long id = database.insert(DatabaseHelper.DEALS_LINES_TABLE_NAME, null, contentValues);
         return id;
@@ -287,7 +288,7 @@ public class DatabaseAdapter {
         private Context context;
 
         private static final String DATABASE_NAME = "BRIEFCASE_DB.db";
-        private static final int VERSION_NUMBER = 2;
+        private static final int VERSION_NUMBER = 10;
 
         /**
          *  Product table

@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.disposables.CompositeDisposable;
 import io.reactivex.rxjava3.functions.Consumer;
 import io.reactivex.rxjava3.schedulers.Schedulers;
@@ -28,7 +29,7 @@ public class PostingToServer {
 
     private CompositeDisposable postDisposable;
 
-    String finalLinesModelInXML = "";
+    String finalLinesModelInXML;
     String finalHeadersModelInXml = "";
     String transactionId = "";
 
@@ -58,7 +59,7 @@ public class PostingToServer {
 
         for (HeadersModel model : listOfHeaders) {
             transactionId = model.getTransactionId();
-            finalHeadersModelInXml += "<Headers>" +
+            finalHeadersModelInXml = "<Headers>" +
                     "<transactionId>" + model.getTransactionId() + "</transactionId>" +
                     "<CustomerCode>" + model.getCustomerCode() + "</CustomerCode>" +
                     "<DealDateFrom>" + model.getDateFrom() + "</DealDateFrom>" +
@@ -70,6 +71,8 @@ public class PostingToServer {
                     .append(mappingInnerModelToXmlFromDatabase(transactionId))
                     .append("</Headers>");
 
+            Log.d("XML_DATA",finalModelBuilder.toString());
+
             postItToTheServer(finalModelBuilder.toString(), transactionId,successInterface);
 
         }
@@ -80,6 +83,7 @@ public class PostingToServer {
     private void postItToTheServer(String xmlData,String transactionId, SuccessInterface successInterface) {
         postDisposable.add(apis.postToServer(xmlData)
                 .observeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Consumer<ResponseBody>() {
                     @Override
                     public void accept(ResponseBody responseBody) throws Throwable {

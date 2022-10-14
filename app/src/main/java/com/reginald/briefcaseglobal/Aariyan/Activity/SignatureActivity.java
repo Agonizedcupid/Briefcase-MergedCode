@@ -25,7 +25,10 @@ import com.google.android.gms.common.api.Api;
 import com.reginald.briefcaseglobal.Aariyan.Database.DatabaseAdapter;
 import com.reginald.briefcaseglobal.Aariyan.Interface.RestApis;
 import com.reginald.briefcaseglobal.Aariyan.Interface.SuccessInterface;
+import com.reginald.briefcaseglobal.Aariyan.Model.SignatureModel;
+import com.reginald.briefcaseglobal.Aariyan.Networking.PostSignature;
 import com.reginald.briefcaseglobal.Aariyan.Networking.PostingToServer;
+import com.reginald.briefcaseglobal.HomeScreen;
 import com.reginald.briefcaseglobal.Network.ApiClient;
 import com.reginald.briefcaseglobal.R;
 
@@ -46,12 +49,15 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import io.reactivex.rxjava3.disposables.CompositeDisposable;
+
 public class SignatureActivity extends AppCompatActivity {
 
     private static String ipUrl = "";
     private DatabaseAdapter databaseAdapter;
 
     RestApis restApis;
+    private String tId = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,6 +69,7 @@ public class SignatureActivity extends AppCompatActivity {
         if (getIntent() != null && getIntent().hasExtra("url")) {
             ipUrl = getIntent().getStringExtra("url");
             restApis = ApiClient.getClient(ipUrl).create(RestApis.class);
+            tId = getIntent().getStringExtra("tID");
         }
 
         initUI();
@@ -124,6 +131,7 @@ public class SignatureActivity extends AppCompatActivity {
                     @Override
                     public void onSuccess(String successMessage) {
                         Toast.makeText(SignatureActivity.this, "" + successMessage, Toast.LENGTH_SHORT).show();
+                        startActivity(new Intent(SignatureActivity.this, HomeScreen.class));
                     }
 
                     @Override
@@ -136,7 +144,7 @@ public class SignatureActivity extends AppCompatActivity {
     private boolean addSignatureJpg(Bitmap signature, String invoiceNo) {
         boolean result = false;
         try {
-            File photo = new File(getAlbumStorageDir("Drivers_App"), String.format("Drivers_App_%d.jpg", System.currentTimeMillis()));
+            File photo = new File(getAlbumStorageDir("BRIEFCASE_GLOBAL"), String.format("BRIEFCASE_GLOBAL_App_%d.jpg", System.currentTimeMillis()));
             saveBitmapToJPG(signature, photo, invoiceNo);
             scanMediaFile(photo);
             result = true;
@@ -166,7 +174,22 @@ public class SignatureActivity extends AppCompatActivity {
         String signature = Base64.encodeToString(byteImage, Base64.DEFAULT);
 
         startProgress("Syncing");
-        new postSignatureWithTransactionId(String.valueOf("" + transactionId()), signature).execute();
+        SignatureModel signatureModel = new SignatureModel(tId, signature);
+        List<SignatureModel> list = new ArrayList<>();
+        list.add(signatureModel);
+        new PostSignature(restApis).postSignatureToServer(new SuccessInterface() {
+            @Override
+            public void onSuccess(String successMessage) {
+                Toast.makeText(SignatureActivity.this, ""+successMessage, Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onError(String errorMessage) {
+                Toast.makeText(SignatureActivity.this, ""+errorMessage, Toast.LENGTH_SHORT).show();
+            }
+        }, list);
+
+        //new postSignatureWithTransactionId(String.valueOf("" + transactionId()), signature).execute();
     }
 
     ProgressDialog progressdialog;
