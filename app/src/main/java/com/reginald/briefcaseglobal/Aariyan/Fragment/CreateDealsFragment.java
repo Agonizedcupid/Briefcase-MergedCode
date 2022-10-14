@@ -3,6 +3,7 @@ package com.reginald.briefcaseglobal.Aariyan.Fragment;
 import android.app.Activity;
 import android.app.DatePickerDialog;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.os.Bundle;
@@ -36,15 +37,18 @@ import android.widget.Toast;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.reginald.briefcaseglobal.Aariyan.Activity.DealsButtonActivity;
+import com.reginald.briefcaseglobal.Aariyan.Activity.SignatureActivity;
 import com.reginald.briefcaseglobal.Aariyan.Adapter.AlreadySelectedItemAdapter;
 import com.reginald.briefcaseglobal.Aariyan.Adapter.ItemAdapter;
 import com.reginald.briefcaseglobal.Aariyan.Database.DatabaseAdapter;
 import com.reginald.briefcaseglobal.Aariyan.Interface.ClickProduct;
+import com.reginald.briefcaseglobal.Aariyan.Interface.InsertHeader_N_Lines;
 import com.reginald.briefcaseglobal.Aariyan.Interface.ItemSelectionInterface;
 import com.reginald.briefcaseglobal.Aariyan.Interface.RestApis;
 import com.reginald.briefcaseglobal.Aariyan.Model.HeadersModel;
 import com.reginald.briefcaseglobal.Aariyan.Model.LinesModel;
 import com.reginald.briefcaseglobal.Aariyan.Model.ProductModel;
+import com.reginald.briefcaseglobal.Aariyan.Networking.Post_N_InsertIntoLocal;
 import com.reginald.briefcaseglobal.Aariyan.ViewModel.ProductViewModel;
 import com.reginald.briefcaseglobal.Network.APIs;
 import com.reginald.briefcaseglobal.Network.ApiClient;
@@ -337,14 +341,18 @@ public class CreateDealsFragment extends Fragment implements View.OnClickListene
                 break;
 
             case R.id.finishBtn:
-                save_N_postDataToLocal_N_Server();
+                saveInLocalDatabase();
+                startActivity(new Intent(activity, SignatureActivity.class)
+                        .putExtra("url", ipURL));
                 break;
 
         }
     }
 
-    private void save_N_postDataToLocal_N_Server() {
-
+    private void saveInLocalDatabase() {
+        InsertHeader_N_Lines performInsertionIntoLocal = new Post_N_InsertIntoLocal(databaseAdapter);
+        performInsertionIntoLocal.insertHeaders(listOfHeaders);
+        performInsertionIntoLocal.insertLines(listOfLines);
     }
 
     private void fungForSelectedItem() {
@@ -451,7 +459,8 @@ public class CreateDealsFragment extends Fragment implements View.OnClickListene
 
         linesModel = new LinesModel(
                 "" + model.getStrPartNumber(),
-                "" + sellingPrice.getText().toString().trim()
+                "" + sellingPrice.getText().toString().trim(),
+                transactionId.getText().toString().trim()
         );
 
 //        new Handler().postDelayed(new Runnable() {

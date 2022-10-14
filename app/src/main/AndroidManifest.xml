@@ -22,24 +22,23 @@
         android:theme="@style/Theme.Briefcaseglobal"
         android:usesCleartextTraffic="true">
         <activity
+            android:name=".SignatureActivity"
+            android:exported="false" />
+        <activity
             android:name=".Aariyan.Activity.DealsButtonActivity"
             android:exported="false"
-            android:theme="@style/myTheme"
-            >
+            android:theme="@style/myTheme">
             <meta-data
                 android:name="android.app.lib_name"
                 android:value="" />
-        </activity>
-
-        <!--For Testing-->
-<!--        <activity-->
-<!--            android:name=".LandingActivity"-->
-<!--            android:exported="false">-->
-<!--            <meta-data-->
-<!--                android:name="android.app.lib_name"-->
-<!--                android:value="" />-->
-<!--        </activity>-->
-
+        </activity> <!-- For Testing -->
+        <!-- <activity -->
+        <!-- android:name=".LandingActivity" -->
+        <!-- android:exported="false"> -->
+        <!-- <meta-data -->
+        <!-- android:name="android.app.lib_name" -->
+        <!-- android:value="" /> -->
+        <!-- </activity> -->
         <service
             android:name=".Service.MainService"
             android:enabled="true"
@@ -151,9 +150,7 @@
             android:windowSoftInputMode="adjustNothing" />
         <activity
             android:name=".Sales"
-            android:screenOrientation="portrait" />
-
-        <!--This is the main launcher activity-->
+            android:screenOrientation="portrait" /> <!-- This is the main launcher activity -->
         <activity
             android:name=".LandingActivity"
             android:exported="true"
@@ -163,21 +160,17 @@
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-        </activity>
-
-        <!--Test Launcher Activity-->
-<!--                <activity-->
-<!--                    android:name=".Aariyan.Activity.DealsButtonActivity"-->
-<!--                    android:exported="true"-->
-<!--                    android:theme="@style/myTheme"-->
-<!--                    android:screenOrientation="portrait">-->
-<!--                    <intent-filter>-->
-<!--                        <action android:name="android.intent.action.MAIN" />-->
-
-<!--                        <category android:name="android.intent.category.LAUNCHER" />-->
-<!--                    </intent-filter>-->
-<!--                </activity>-->
-
+        </activity> <!-- Test Launcher Activity -->
+        <!-- <activity -->
+        <!-- android:name=".Aariyan.Activity.DealsButtonActivity" -->
+        <!-- android:exported="true" -->
+        <!-- android:theme="@style/myTheme" -->
+        <!-- android:screenOrientation="portrait"> -->
+        <!-- <intent-filter> -->
+        <!-- <action android:name="android.intent.action.MAIN" /> -->
+        <!-- <category android:name="android.intent.category.LAUNCHER" /> -->
+        <!-- </intent-filter> -->
+        <!-- </activity> -->
         <service
             android:name=".DriverService"
             android:enabled="true"

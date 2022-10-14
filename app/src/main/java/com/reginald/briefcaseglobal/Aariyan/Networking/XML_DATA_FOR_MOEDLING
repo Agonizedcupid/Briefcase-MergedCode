@@ -1,0 +1,23 @@
+# This data is using in class PostingToServer:
+
+//Sample Data:
+<Headers>
+  <transactionId>1665662263-8405cc9dad963a45</transactionId>
+  <CustomerCode>JUK001</CustomerCode>
+  <DealDateFrom>2022-010-14</DealDateFrom>
+  <DealDateTo>2022-010-14</DealDateTo>
+  <CreatedByID>0</CreatedByID>
+  <Coordinates>-34.033013600000004,23.04171</Coordinates>
+    <Lines> // Lines model is formatting in linesModelFormatLikeXML() this method:
+        <ProductCode>CHP0001</ProductCode>
+        <Price>283.7</Price>
+    </Lines>
+     <Lines>
+        <ProductCode>CV0001</ProductCode>
+        <Price>100</Price>
+    </Lines>
+       <Lines>
+        <ProductCode>K3444</ProductCode>
+        <Price>25.50</Price>
+    </Lines>
+</Headers>

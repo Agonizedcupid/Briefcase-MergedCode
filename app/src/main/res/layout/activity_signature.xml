@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".Aariyan.Activity.SignatureActivity">
+
+    <com.google.android.material.appbar.MaterialToolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        android:background="@color/myblue"
+        >
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal"
+            >
+
+            <ImageView
+                android:id="@+id/backBtn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/back_arrow_white"
+                />
+
+            <TextView
+                android:id="@+id/toolbarTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="15dp"
+                android:text="Signature"
+                android:textStyle="bold"
+                android:textSize="16sp"
+                android:textColor="@android:color/white"
+                />
+
+        </LinearLayout>
+
+    </com.google.android.material.appbar.MaterialToolbar>
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/signatureCard"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        app:cardCornerRadius="15dp"
+        app:cardElevation="10dp"
+        app:cardUseCompatPadding="true"
+        app:layout_constraintTop_toBottomOf="@id/toolbar"
+        app:layout_constraintBottom_toTopOf="@id/finalFinish"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:cardBackgroundColor="@android:color/white"
+        >
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+            <com.github.gcacace.signaturepad.views.SignaturePad
+                android:id="@+id/ack_sign"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@android:color/white"
+                app:penColor="@android:color/black"
+                android:padding="15dp"
+                />
+
+            <ImageView
+                android:id="@+id/undoSignature"
+                android:layout_width="wrap_content"
+                android:layout_height="40dp"
+                android:src="@drawable/undo_icon"
+                android:background="@drawable/non_pressed"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintTop_creator="1"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintRight_creator="1"
+                />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+
+
+    </androidx.cardview.widget.CardView>
+
+        <Button
+            android:id="@+id/finalFinish"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Finish"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:background="@color/myblue"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            android:layout_margin="15dp"
+            />
+</androidx.constraintlayout.widget.ConstraintLayout>

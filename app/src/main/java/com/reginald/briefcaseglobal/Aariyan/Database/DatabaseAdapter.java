@@ -11,6 +11,7 @@ import androidx.annotation.Nullable;
 
 import com.reginald.briefcaseglobal.Aariyan.Model.DealHeaderModel;
 import com.reginald.briefcaseglobal.Aariyan.Model.HeadersModel;
+import com.reginald.briefcaseglobal.Aariyan.Model.LinesModel;
 import com.reginald.briefcaseglobal.Aariyan.Model.ProductModel;
 
 import java.util.ArrayList;
@@ -61,6 +62,17 @@ public class DatabaseAdapter {
         contentValues.put(DatabaseHelper.productCode, model.getProductCode());
 
         long id = database.insert(DatabaseHelper.DEALS_HEADERS_TABLE_NAME, null, contentValues);
+        return id;
+    }
+
+    public long insertLines(LinesModel model) {
+        SQLiteDatabase database = helper.getWritableDatabase();
+
+        ContentValues contentValues = new ContentValues();
+        contentValues.put(DatabaseHelper.itemCode, model.getProductCode());
+        contentValues.put(DatabaseHelper.itemPrice, model.getPrice());
+
+        long id = database.insert(DatabaseHelper.DEALS_LINES_TABLE_NAME, null, contentValues);
         return id;
     }
 
@@ -123,24 +135,115 @@ public class DatabaseAdapter {
 
     }
 
+    public List<LinesModel> getLines() {
+        List<LinesModel> listOfLines = new ArrayList<>();
+        SQLiteDatabase database = helper.getWritableDatabase();
+
+        String[] columns = {DatabaseHelper.UID, DatabaseHelper.itemCode, DatabaseHelper.itemPrice};
+
+        Cursor cursor = database.query(DatabaseHelper.DEALS_LINES_TABLE_NAME, columns, null, null, null, null, null);
+        while (cursor.moveToNext()) {
+            LinesModel model = new LinesModel(
+                    cursor.getString(1),
+                    cursor.getString(2),
+                    cursor.getString(3)
+            );
+            listOfLines.add(model);
+        }
+        return listOfLines;
+
+    }
+
+    public List<LinesModel> getLinesByTransactionId(String transactionId) {
+
+        List<LinesModel> listOfLines = new ArrayList<>();
+        SQLiteDatabase database = helper.getWritableDatabase();
+        //select * from tableName where name = ? and customerName = ?:
+        // String selection = DatabaseHelper.USER_NAME+" where ? AND "+DatabaseHelper.CUSTOMER_NAME+" LIKE ?";
+        String selection = DatabaseHelper.transactionIdInLines + "=?";
+        String[] args = {"" + transactionId};
+        String[] columns = {DatabaseHelper.UID, DatabaseHelper.itemCode, DatabaseHelper.itemPrice, DatabaseHelper.transactionIdInLines};
+
+        Cursor cursor = database.query(DatabaseHelper.DEALS_LINES_TABLE_NAME, columns, selection, args, null, null, null);
+        while (cursor.moveToNext()) {
+            LinesModel model = new LinesModel(
+                    cursor.getString(1),
+                    cursor.getString(2),
+                    cursor.getString(3)
+            );
+            listOfLines.add(model);
+        }
+        return listOfLines;
+
+    }
+
+    public List<HeadersModel> getHeaders() {
+        List<HeadersModel> listOfHeaders = new ArrayList<>();
+        SQLiteDatabase database = helper.getWritableDatabase();
+
+        String[] columns = {DatabaseHelper.UID, DatabaseHelper.transactionID,
+                DatabaseHelper.customerCode,
+                DatabaseHelper.dateFrom,
+                DatabaseHelper.dateTo,
+                DatabaseHelper.userId,
+                DatabaseHelper.isCompleted,
+                DatabaseHelper.isUploaded,
+                DatabaseHelper.productName,
+                DatabaseHelper.productPrice,
+                DatabaseHelper.productCode
+        };
+
+        Cursor cursor = database.query(DatabaseHelper.DEALS_HEADERS_TABLE_NAME, columns, null, null, null, null, null);
+
+        while (cursor.moveToNext()) {
+            HeadersModel model = new HeadersModel(
+                    cursor.getString(1),
+                    cursor.getString(2),
+                    cursor.getString(3),
+                    cursor.getString(4),
+                    cursor.getString(5),
+                    cursor.getInt(6),
+                    cursor.getInt(7),
+                    cursor.getString(8),
+                    cursor.getString(9),
+                    cursor.getString(10)
+            );
+             listOfHeaders.add(model);
+        }
+        return listOfHeaders;
+
+    }
+
 
     /**
      * Update
      */
-    //Update Quantity of lines table, as well as changing the flag value using orderId & orderDetailsId:
-//    public long updateLinesLoaded(int orderId, int orderDetailsId, int flag, int loaded) {
-//        SQLiteDatabase database = helper.getWritableDatabase();
-//        String selection = DatabaseHelper.OrderIds + " LIKE ? AND " + DatabaseHelper.OrderDetailId + " LIKE ? ";
+    //Update isCompleted:
+    public long updateDealsHeadersIsCompleted(int flag) {
+        SQLiteDatabase database = helper.getWritableDatabase();
+//        String selection = DatabaseHelper.isCompleted + " LIKE ? AND " + DatabaseHelper.OrderDetailId + " LIKE ? ";
 //        String[] args = {"" + orderId, "" + orderDetailsId};
-//
-//        ContentValues contentValues = new ContentValues();
-//        contentValues.put(DatabaseHelper.FLAG, flag);
-//        contentValues.put(DatabaseHelper.Loadeds, loaded);
-//
-//        long ids = database.update(DatabaseHelper.LINES_TABLE_NAME, contentValues, selection, args);
-//
-//        return ids;
-//    }
+
+        ContentValues contentValues = new ContentValues();
+        contentValues.put(DatabaseHelper.isCompleted, flag);
+
+        long ids = database.update(DatabaseHelper.DEALS_HEADERS_TABLE_NAME, contentValues, null, null);
+
+        return ids;
+    }
+
+    public long updateDealsHeadersIsUploaded(String transactionId) {
+        SQLiteDatabase database = helper.getWritableDatabase();
+        String selection = DatabaseHelper.transactionID + " LIKE ? ";
+        String[] args = {"" + transactionId};
+
+        ContentValues contentValues = new ContentValues();
+        contentValues.put(DatabaseHelper.isUploaded, 1);
+
+        long ids = database.update(DatabaseHelper.DEALS_HEADERS_TABLE_NAME, contentValues, selection, args);
+
+        return ids;
+    }
 
     /**
      *  Delete
@@ -171,6 +274,12 @@ public class DatabaseAdapter {
         SQLiteDatabase database = helper.getWritableDatabase();
         database.execSQL(DatabaseHelper.DROP_DEALS_HEADERS_TABLE);
         database.execSQL(DatabaseHelper.CREATE_DEALS_HEADERS_TABLE);
+    }
+
+    public void dropDealsLinesTable() {
+        SQLiteDatabase database = helper.getWritableDatabase();
+        database.execSQL(DatabaseHelper.DROP_DEALS_LINES_TABLE);
+        database.execSQL(DatabaseHelper.CREATE_DEALS_LINES_TABLE);
     }
 
 
@@ -239,6 +348,21 @@ public class DatabaseAdapter {
         private static final String DROP_DEALS_HEADERS_TABLE = "DROP TABLE IF EXISTS " + DEALS_HEADERS_TABLE_NAME;
 
 
+        private static final String DEALS_LINES_TABLE_NAME = "DEALS_LINES";
+        private static final String itemCode = "itemCode";
+        private static final String itemPrice = "itemPrice";
+        private static final String transactionIdInLines = "transactionId";
+
+        //Creating the table:
+        private static final String CREATE_DEALS_LINES_TABLE = "CREATE TABLE " + DEALS_LINES_TABLE_NAME
+                + " (" + UID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
+                + itemCode + " VARCHAR(255),"
+                + itemPrice + " VARCHAR(255),"
+                + transactionIdInLines + " VARCHAR(255));";
+
+        private static final String DROP_DEALS_LINES_TABLE = "DROP TABLE IF EXISTS " + DEALS_LINES_TABLE_NAME;
+
+
 
         public DatabaseHelper(@Nullable Context context) {
             super(context, DATABASE_NAME, null, VERSION_NUMBER);
@@ -251,6 +375,7 @@ public class DatabaseAdapter {
             try {
                 db.execSQL(CREATE_PRODUCT_TABLE);
                 db.execSQL(CREATE_DEALS_HEADERS_TABLE);
+                db.execSQL(CREATE_DEALS_LINES_TABLE);
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -262,6 +387,7 @@ public class DatabaseAdapter {
             try {
                 db.execSQL(DROP_PRODUCT_TABLE);
                 db.execSQL(DROP_DEALS_HEADERS_TABLE);
+                db.execSQL(DROP_DEALS_LINES_TABLE);
                 onCreate(db);
             } catch (Exception e) {
                 e.printStackTrace();
