@@ -72,7 +72,11 @@ public class LandingActivity extends AppCompatActivity {
             }
         });
 
+
+
     }
+
+
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         if (requestCode == 1) {// If request is cancelled, the result arrays are empty.

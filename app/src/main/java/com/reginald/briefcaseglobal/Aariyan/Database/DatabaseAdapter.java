@@ -178,6 +178,47 @@ public class DatabaseAdapter {
 
     }
 
+    public List<HeadersModel> getHeadersByUploaded() {
+
+        List<HeadersModel> listOfHeaders = new ArrayList<>();
+        SQLiteDatabase database = helper.getWritableDatabase();
+        //select * from tableName where name = ? and customerName = ?:
+        // String selection = DatabaseHelper.USER_NAME+" where ? AND "+DatabaseHelper.CUSTOMER_NAME+" LIKE ?";
+        String selection = DatabaseHelper.isUploaded + "=?";
+        String[] args = {"" + 0};
+        String[] columns = {DatabaseHelper.UID, DatabaseHelper.transactionID,
+                DatabaseHelper.customerCode,
+                DatabaseHelper.dateFrom,
+                DatabaseHelper.dateTo,
+                DatabaseHelper.userId,
+                DatabaseHelper.isCompleted,
+                DatabaseHelper.isUploaded,
+                DatabaseHelper.productName,
+                DatabaseHelper.productPrice,
+                DatabaseHelper.productCode
+        };
+
+        Cursor cursor = database.query(DatabaseHelper.DEALS_HEADERS_TABLE_NAME, columns, selection, args, null, null, null);
+
+        while (cursor.moveToNext()) {
+            HeadersModel model = new HeadersModel(
+                    cursor.getString(1),
+                    cursor.getString(2),
+                    cursor.getString(3),
+                    cursor.getString(4),
+                    cursor.getString(5),
+                    cursor.getInt(6),
+                    cursor.getInt(7),
+                    cursor.getString(8),
+                    cursor.getString(9),
+                    cursor.getString(10)
+            );
+            listOfHeaders.add(model);
+        }
+        return listOfHeaders;
+
+    }
+
     public List<HeadersModel> getHeaders() {
         List<HeadersModel> listOfHeaders = new ArrayList<>();
         SQLiteDatabase database = helper.getWritableDatabase();
@@ -288,7 +329,7 @@ public class DatabaseAdapter {
         private Context context;
 
         private static final String DATABASE_NAME = "BRIEFCASE_DB.db";
-        private static final int VERSION_NUMBER = 10;
+        private static final int VERSION_NUMBER = 11;
 
         /**
          *  Product table

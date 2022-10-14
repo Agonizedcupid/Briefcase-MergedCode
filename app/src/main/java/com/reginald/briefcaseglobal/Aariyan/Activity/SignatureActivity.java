@@ -2,13 +2,19 @@ package com.reginald.briefcaseglobal.Aariyan.Activity;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
 
+import android.Manifest;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.location.Address;
+import android.location.Geocoder;
+import android.location.Location;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -22,6 +28,9 @@ import android.widget.Toast;
 
 import com.github.gcacace.signaturepad.views.SignaturePad;
 import com.google.android.gms.common.api.Api;
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.reginald.briefcaseglobal.Aariyan.Database.DatabaseAdapter;
 import com.reginald.briefcaseglobal.Aariyan.Interface.RestApis;
 import com.reginald.briefcaseglobal.Aariyan.Interface.SuccessInterface;
@@ -29,6 +38,8 @@ import com.reginald.briefcaseglobal.Aariyan.Model.SignatureModel;
 import com.reginald.briefcaseglobal.Aariyan.Networking.PostSignature;
 import com.reginald.briefcaseglobal.Aariyan.Networking.PostingToServer;
 import com.reginald.briefcaseglobal.HomeScreen;
+import com.reginald.briefcaseglobal.Interface.CurrentLocation;
+import com.reginald.briefcaseglobal.LogVisit;
 import com.reginald.briefcaseglobal.Network.ApiClient;
 import com.reginald.briefcaseglobal.R;
 
@@ -48,6 +59,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 import io.reactivex.rxjava3.disposables.CompositeDisposable;
 
@@ -59,13 +71,15 @@ public class SignatureActivity extends AppCompatActivity {
     RestApis restApis;
     private String tId = "";
 
+    FusedLocationProviderClient client;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_signature);
 
         databaseAdapter = new DatabaseAdapter(this);
-
+        client = LocationServices.getFusedLocationProviderClient(this);
         if (getIntent() != null && getIntent().hasExtra("url")) {
             ipUrl = getIntent().getStringExtra("url");
             restApis = ApiClient.getClient(ipUrl).create(RestApis.class);
@@ -125,20 +139,52 @@ public class SignatureActivity extends AppCompatActivity {
             Toast.makeText(this, "Updated", Toast.LENGTH_SHORT).show();
         }
 
-        //check data is also posted to the server or not:
-        new PostingToServer(databaseAdapter, restApis)
-                .tryDirectPostingToServer(new SuccessInterface() {
-                    @Override
-                    public void onSuccess(String successMessage) {
-                        Toast.makeText(SignatureActivity.this, "" + successMessage, Toast.LENGTH_SHORT).show();
-                        startActivity(new Intent(SignatureActivity.this, HomeScreen.class));
-                    }
+        //get Location:
+        getCurrentLocation(new CurrentLocation() {
+            @Override
+            public void getLocation(double latitude, double longitude) {
+                Log.d("LOCATION_CHECKING", "getLocation: "+latitude +" - "+longitude);
+                //check data is also posted to the server or not:
+                new PostingToServer(databaseAdapter, restApis, latitude, longitude)
+                        .tryDirectPostingToServer(new SuccessInterface() {
+                            @Override
+                            public void onSuccess(String successMessage) {
+                                Toast.makeText(SignatureActivity.this, "" + successMessage, Toast.LENGTH_SHORT).show();
+                                startActivity(new Intent(SignatureActivity.this, HomeScreen.class));
+                            }
 
-                    @Override
-                    public void onError(String errorMessage) {
-                        Toast.makeText(SignatureActivity.this, "" + errorMessage, Toast.LENGTH_SHORT).show();
+                            @Override
+                            public void onError(String errorMessage) {
+                                Toast.makeText(SignatureActivity.this, "" + errorMessage, Toast.LENGTH_SHORT).show();
+                            }
+                        });
+            }
+        });
+
+    }
+
+    private void getCurrentLocation(CurrentLocation currentLocation) {
+        //Check the location permission:
+        if (ActivityCompat.checkSelfPermission(SignatureActivity.this, Manifest.permission.ACCESS_FINE_LOCATION) ==
+                PackageManager.PERMISSION_GRANTED) {
+            client.getLastLocation().addOnSuccessListener(new OnSuccessListener<Location>() {
+                @Override
+                public void onSuccess(Location location) {
+                    if (location != null) {
+                        try {
+                            Geocoder geocoder = new Geocoder(SignatureActivity.this, Locale.getDefault());
+                            List<Address> list = geocoder.getFromLocation(location.getLatitude(), location.getLongitude(), 1);
+                            currentLocation.getLocation(list.get(0).getLatitude(), list.get(0).getLongitude());
+                        } catch (Exception e) {
+
+                        }
                     }
-                });
+                }
+            });
+        } else {
+            //request for the location access
+            ActivityCompat.requestPermissions(SignatureActivity.this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 101);
+        }
     }
 
     private boolean addSignatureJpg(Bitmap signature, String invoiceNo) {

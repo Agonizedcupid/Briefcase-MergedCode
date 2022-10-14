@@ -33,13 +33,15 @@ public class PostingToServer {
     String finalHeadersModelInXml = "";
     String transactionId = "";
 
-    StringBuilder finalModelBuilder = new StringBuilder();
+    double lat, lng;
 
-    public PostingToServer(DatabaseAdapter databaseAdapter, RestApis apis) {
+    public PostingToServer(DatabaseAdapter databaseAdapter, RestApis apis, double lat, double lng) {
         this.databaseAdapter = databaseAdapter;
         this.apis = apis;
         executorService = Executors.newSingleThreadExecutor();
         postDisposable = new CompositeDisposable();
+        this.lat = lat;
+        this.lng = lng;
     }
 
     public void tryDirectPostingToServer(SuccessInterface successInterface) {
@@ -54,36 +56,64 @@ public class PostingToServer {
 
     }
 
+
     private void mappingOuterModelToXmlFromDatabase(SuccessInterface successInterface) {
-        List<HeadersModel> listOfHeaders = databaseAdapter.getHeaders();
+        List<HeadersModel> listOfHeaders = databaseAdapter.getHeadersByUploaded();
+        StringBuilder finalModelBuilder = new StringBuilder();
+        HeadersModel model = listOfHeaders.get(0);
+        transactionId = model.getTransactionId();
+        finalHeadersModelInXml = "<Headers>" +
+                "<transactionId>" + model.getTransactionId() + "</transactionId>" +
+                "<CustomerCode>" + model.getCustomerCode() + "</CustomerCode>" +
+                "<DealDateFrom>" + model.getDateFrom() + "</DealDateFrom>" +
+                "<DealDateTo>" + model.getDateTo() + "</DealDateTo>" +
+                "<CreatedByID>" + model.getUserId() + "</CreatedByID>" +
+                //"<Coordinates>" + String.valueOf("-34.033013600000004,23.04171") + "</Coordinates>";
+                "<Coordinates>" + String.valueOf(lat + "," + lng) + "</Coordinates>";
 
-        for (HeadersModel model : listOfHeaders) {
-            transactionId = model.getTransactionId();
-            finalHeadersModelInXml = "<Headers>" +
-                    "<transactionId>" + model.getTransactionId() + "</transactionId>" +
-                    "<CustomerCode>" + model.getCustomerCode() + "</CustomerCode>" +
-                    "<DealDateFrom>" + model.getDateFrom() + "</DealDateFrom>" +
-                    "<DealDateTo>" + model.getDateTo() + "</DealDateTo>" +
-                    "<CreatedByID>" + model.getUserId() + "</CreatedByID>" +
-                    "<Coordinates>" + String.valueOf("-34.033013600000004,23.04171") + "</Coordinates>";
+        finalModelBuilder.append(finalHeadersModelInXml)
+                .append(mappingInnerModelToXmlFromDatabase(transactionId))
+                .append("</Headers>");
 
-            finalModelBuilder.append(finalHeadersModelInXml)
-                    .append(mappingInnerModelToXmlFromDatabase(transactionId))
-                    .append("</Headers>");
-
-            Log.d("XML_DATA",finalModelBuilder.toString());
-
-            postItToTheServer(finalModelBuilder.toString(), transactionId,successInterface);
-
-        }
-
+        postItToTheServer(finalModelBuilder.toString(), transactionId, successInterface);
 
     }
 
-    private void postItToTheServer(String xmlData,String transactionId, SuccessInterface successInterface) {
+    //Looping
+//    private void mappingOuterModelToXmlFromDatabase(SuccessInterface successInterface) {
+//        List<HeadersModel> listOfHeaders = databaseAdapter.getHeadersByUploaded();
+//        StringBuilder finalModelBuilder = new StringBuilder();
+//        for (HeadersModel model : listOfHeaders) {
+//            transactionId = model.getTransactionId();
+//            finalHeadersModelInXml = "<Headers>" +
+//                    "<transactionId>" + model.getTransactionId() + "</transactionId>" +
+//                    "<CustomerCode>" + model.getCustomerCode() + "</CustomerCode>" +
+//                    "<DealDateFrom>" + model.getDateFrom() + "</DealDateFrom>" +
+//                    "<DealDateTo>" + model.getDateTo() + "</DealDateTo>" +
+//                    "<CreatedByID>" + model.getUserId() + "</CreatedByID>" +
+//                    //"<Coordinates>" + String.valueOf("-34.033013600000004,23.04171") + "</Coordinates>";
+//                    "<Coordinates>" + String.valueOf(lat + "," + lng) + "</Coordinates>";
+//
+//            finalModelBuilder.append(finalHeadersModelInXml)
+//                    .append(mappingInnerModelToXmlFromDatabase(transactionId))
+//                    .append("</Headers>");
+//
+//            postItToTheServer(finalModelBuilder.toString(), transactionId, successInterface);
+////            postItToTheServer(finalHeadersModelInXml +
+////                    mappingInnerModelToXmlFromDatabase(transactionId) +
+////                    "</Headers>", transactionId, successInterface);
+//
+//        }
+//
+//
+//    }
+
+
+    private void postItToTheServer(String xmlData, String transactionId, SuccessInterface successInterface) {
+        Log.d("XML_DATA", xmlData);
         postDisposable.add(apis.postToServer(xmlData)
                 .observeOn(Schedulers.io())
-                        .observeOn(AndroidSchedulers.mainThread())
+                .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Consumer<ResponseBody>() {
                     @Override
                     public void accept(ResponseBody responseBody) throws Throwable {
@@ -101,7 +131,7 @@ public class PostingToServer {
                 }, new Consumer<Throwable>() {
                     @Override
                     public void accept(Throwable throwable) throws Throwable {
-                        successInterface.onError(""+throwable.getMessage());
+                        successInterface.onError("" + throwable.getMessage());
                     }
                 }));
     }
@@ -118,16 +148,22 @@ public class PostingToServer {
      */
 
     private String mappingInnerModelToXmlFromDatabase(String transactionId) {
+        StringBuilder builder = new StringBuilder();
         List<LinesModel> listOfLines = databaseAdapter.getLinesByTransactionId(transactionId);
         if (listOfLines.size() > 0) {
             for (LinesModel model : listOfLines) {
-                finalLinesModelInXML += linesModelFormatLikeXML()
+//                finalLinesModelInXML += linesModelFormatLikeXML()
+//                        .replace("pCode", model.getProductCode())
+//                        .replace("price", model.getPrice());
+                builder.append(linesModelFormatLikeXML()
                         .replace("pCode", model.getProductCode())
-                        .replace("price", model.getPrice());
+                        .replace("price", model.getPrice()
+                        ));
             }
         }
         Log.d("LINES_FORMAT", "mappingDataToXmlFromDatabase: " + finalLinesModelInXML);
-        return finalLinesModelInXML;
+        //return finalLinesModelInXML;
+        return builder.toString();
     }
 
 
@@ -139,4 +175,5 @@ public class PostingToServer {
         return Xml;
 
     }
+
 }
