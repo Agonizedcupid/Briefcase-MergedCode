@@ -37,6 +37,7 @@ import com.reginald.briefcaseglobal.Aariyan.Interface.SuccessInterface;
 import com.reginald.briefcaseglobal.Aariyan.Model.SignatureModel;
 import com.reginald.briefcaseglobal.Aariyan.Networking.PostSignature;
 import com.reginald.briefcaseglobal.Aariyan.Networking.PostingToServer;
+import com.reginald.briefcaseglobal.CustomersActivity;
 import com.reginald.briefcaseglobal.HomeScreen;
 import com.reginald.briefcaseglobal.Interface.CurrentLocation;
 import com.reginald.briefcaseglobal.LogVisit;
@@ -150,7 +151,7 @@ public class SignatureActivity extends AppCompatActivity {
                             @Override
                             public void onSuccess(String successMessage) {
                                 Toast.makeText(SignatureActivity.this, "" + successMessage, Toast.LENGTH_SHORT).show();
-                                startActivity(new Intent(SignatureActivity.this, HomeScreen.class));
+                                startActivity(new Intent(SignatureActivity.this, CustomersActivity.class));
                             }
 
                             @Override

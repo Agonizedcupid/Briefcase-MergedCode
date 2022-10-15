@@ -340,16 +340,28 @@ public class CreateDealsFragment extends Fragment implements View.OnClickListene
                 fungForSelectedItem();
                 headersModel.setProductPrice(sellingPrice.getText().toString().trim());
                 linesModel.setPrice(sellingPrice.getText().toString().trim());
+
+                removeOlderDataFromBottomShet();
                 break;
 
             case R.id.finishBtn:
                 saveInLocalDatabase();
                 startActivity(new Intent(activity, SignatureActivity.class)
                         .putExtra("url", ipURL)
-                        .putExtra("tID",""+transactionId.getText().toString().trim()));
+                        .putExtra("tID", "" + transactionId.getText().toString().trim()));
                 break;
 
         }
+    }
+
+    private void removeOlderDataFromBottomShet() {
+        searchBar.setText(null);
+        dividerTwo.setVisibility(View.GONE);
+        sellingPrice.setText(null, TextView.BufferType.EDITABLE);
+        gpTextView.setText("00000");
+        selectedItemLayout.setVisibility(View.GONE);
+        bottomLayout.setVisibility(View.GONE);
+        finishBtnInBottomSheet.setVisibility(View.GONE);
     }
 
     private void saveInLocalDatabase() {
@@ -446,7 +458,7 @@ public class CreateDealsFragment extends Fragment implements View.OnClickListene
         afterSelectedName.setText(String.valueOf("ITEM SELECTED, NAME: " + model.getStrDesc()));
         afterSelectedCost.setText(String.valueOf("ITEM COST: " + model.getCost()));
 
-        String tID =  transactionId.getText().toString().trim();
+        String tID = transactionId.getText().toString().trim();
 
         //Populating data for saving and posting:
         headersModel = new HeadersModel(
@@ -463,11 +475,10 @@ public class CreateDealsFragment extends Fragment implements View.OnClickListene
         );
 
 
-
         linesModel = new LinesModel(
                 "" + model.getStrPartNumber(),
                 "" + sellingPrice.getText().toString().trim(),
-                ""+tID
+                "" + tID
         );
 
 //        new Handler().postDelayed(new Runnable() {
