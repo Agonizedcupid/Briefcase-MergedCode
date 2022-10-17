@@ -379,7 +379,12 @@ public class CustomersActivity extends AppCompatActivity {
         goNext.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                //Toast.makeText(CustomersActivity.this, ""+custcode.getText().toString().trim(), Toast.LENGTH_SHORT).show();
                 if (!custcode.getText().toString().trim().isEmpty() || !custcode.getText().toString().trim().equals("")) {
+                    if (!sharedPreferences.getString("CODE", "SA005").equals(custcode.getText().toString().trim())) {
+                        editor.putString("from", "Date From");
+                        editor.putString("to", "Date To");
+                    }
                     editor.putString("CODE", custcode.getText().toString().trim());
                     editor.commit();
                     startActivity(new Intent(CustomersActivity.this, DealsButtonActivity.class)

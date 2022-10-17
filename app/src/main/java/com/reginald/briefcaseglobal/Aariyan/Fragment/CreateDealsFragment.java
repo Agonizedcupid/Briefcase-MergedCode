@@ -465,6 +465,11 @@ public class CreateDealsFragment extends Fragment implements View.OnClickListene
         costForGP = model.getCost();
         afterSelectedName.setText(String.valueOf("ITEM SELECTED, NAME: " + model.getStrDesc()));
         afterSelectedCost.setText(String.valueOf("ITEM COST: " + model.getCost()));
+        gpTextView.setText("00000");
+        if (!TextUtils.isEmpty(sellingPrice.getText().toString().trim())) {
+            sellingPrice.setText("", TextView.BufferType.EDITABLE);
+        }
+        finalPrice.setText("");
 
         String tID = transactionId.getText().toString().trim();
 
