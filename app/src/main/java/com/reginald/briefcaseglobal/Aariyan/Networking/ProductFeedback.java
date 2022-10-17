@@ -45,6 +45,8 @@ public class ProductFeedback {
                     @Override
                     public void accept(ResponseBody responseBody) throws Throwable {
                         JSONArray root = new JSONArray(responseBody.string());
+                        Log.d("PRODUCT_CHECKING", customerCode+" accept: "+root.toString());
+
                         if (root.length() > 0) {
                             for (int i = 0; i < root.length(); i++) {
                                 JSONObject single = root.getJSONObject(i);

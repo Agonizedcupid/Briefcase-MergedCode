@@ -382,7 +382,8 @@ public class CustomersActivity extends AppCompatActivity {
                 if (!custcode.getText().toString().trim().isEmpty() || !custcode.getText().toString().trim().equals("")) {
                     editor.putString("CODE", custcode.getText().toString().trim());
                     editor.commit();
-                    startActivity(new Intent(CustomersActivity.this, DealsButtonActivity.class));
+                    startActivity(new Intent(CustomersActivity.this, DealsButtonActivity.class)
+                            .putExtra("url", IP));
                 } else {
                     Toast.makeText(CustomersActivity.this, "Select a customer", Toast.LENGTH_SHORT).show();
                 }
@@ -1052,6 +1053,20 @@ public class CustomersActivity extends AppCompatActivity {
 
             }
         });
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        Cursor cursor2 = dbOrders.rawQuery("SELECT * from tblSettings limit 1", null);
+
+        if (cursor2.moveToFirst()) {
+            do {
+                IP = cursor2.getString(cursor2.getColumnIndex("IP"));
+                DimsIp = cursor2.getString(cursor2.getColumnIndex("DimsIp"));
+
+            } while (cursor2.moveToNext());
+        }
     }
 
     @Override

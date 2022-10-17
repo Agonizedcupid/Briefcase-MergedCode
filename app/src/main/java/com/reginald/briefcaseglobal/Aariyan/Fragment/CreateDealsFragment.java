@@ -50,6 +50,7 @@ import com.reginald.briefcaseglobal.Aariyan.Model.LinesModel;
 import com.reginald.briefcaseglobal.Aariyan.Model.ProductModel;
 import com.reginald.briefcaseglobal.Aariyan.Networking.Post_N_InsertIntoLocal;
 import com.reginald.briefcaseglobal.Aariyan.ViewModel.ProductViewModel;
+import com.reginald.briefcaseglobal.CustomersActivity;
 import com.reginald.briefcaseglobal.Network.APIs;
 import com.reginald.briefcaseglobal.Network.ApiClient;
 import com.reginald.briefcaseglobal.R;
@@ -142,7 +143,6 @@ public class CreateDealsFragment extends Fragment implements View.OnClickListene
 
         databaseAdapter = new DatabaseAdapter(activity);
         sharedPreferences = activity.getSharedPreferences("IP_FILE", Context.MODE_PRIVATE);
-        ;
         editor = sharedPreferences.edit();
 
         transactionId = view.findViewById(R.id.transactionId);
@@ -241,7 +241,15 @@ public class CreateDealsFragment extends Fragment implements View.OnClickListene
     @Override
     public void onResume() {
         super.onResume();
-        ipURL = sharedPreferences.getString("IP", BASE_URL);
+        //ipURL = sharedPreferences.getString("IP", BASE_URL);
+        if (!DealsButtonActivity.IP_URL.equals("")) {
+            ipURL = DealsButtonActivity.IP_URL;
+        } else {
+            startActivity(new Intent(activity, CustomersActivity.class));
+            Toast.makeText(activity, "Sorry, We didn't get IP, Please continue from there!", Toast.LENGTH_SHORT).show();
+        }
+        Toast.makeText(activity, ""+ipURL, Toast.LENGTH_SHORT).show();
+
         userID = sharedPreferences.getString("ID", "SA005");
         code = sharedPreferences.getString("CODE", "SA005");
         customerCode.setText(String.valueOf("" + code));
@@ -271,7 +279,7 @@ public class CreateDealsFragment extends Fragment implements View.OnClickListene
         viewModel = new ViewModelProvider(this).get(ProductViewModel.class);
         //viewModel.init(apiService, code, databaseAdapter);
         //Testing:
-        viewModel.init(apiService, "SA005", databaseAdapter);
+        viewModel.init(apiService, ""+code, databaseAdapter);
         viewModel.getListOfProducts().observe(activity, new Observer<List<ProductModel>>() {
             @Override
             public void onChanged(List<ProductModel> productModels) {

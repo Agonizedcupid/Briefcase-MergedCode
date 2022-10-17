@@ -47,6 +47,7 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+import com.reginald.briefcaseglobal.Aariyan.Database.DatabaseAdapter;
 
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
@@ -595,6 +596,9 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                                     i.putExtra("roles", "");
                                     i.putExtra("name", Username);
                                     startActivity(i);
+
+                                    DatabaseAdapter databaseAdapter = new DatabaseAdapter(LoginActivity.this);
+                                    databaseAdapter.dropProductTable();
                                 }
                             }
 

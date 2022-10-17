@@ -22,6 +22,8 @@ public class DealsButtonActivity extends AppCompatActivity {
     private BottomNavigationView bottomNavigationView;
     private TextView toolbarTitle;
 
+    public static String IP_URL = "";
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,6 +34,13 @@ public class DealsButtonActivity extends AppCompatActivity {
         intUI();
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (getIntent() != null && getIntent().hasExtra("url")) {
+            IP_URL = getIntent().getStringExtra("url");
+        }
+    }
 
     private void intUI() {
 //        findViewById(R.id.createDeals).setOnClickListener(new View.OnClickListener() {

@@ -23,6 +23,9 @@ import io.reactivex.rxjava3.schedulers.Schedulers;
 import okhttp3.ResponseBody;
 
 public class PostingToServer {
+
+    private static final String TAG = "PostingToServer";
+
     private DatabaseAdapter databaseAdapter;
     RestApis apis;
     private ExecutorService executorService;
@@ -118,6 +121,7 @@ public class PostingToServer {
                     @Override
                     public void accept(ResponseBody responseBody) throws Throwable {
                         JSONArray status = new JSONArray(responseBody.string());
+                        Log.d(TAG, "accept: "+status);
                         JSONObject single = status.getJSONObject(0);
                         String result = single.getString("result");
 
@@ -131,6 +135,7 @@ public class PostingToServer {
                 }, new Consumer<Throwable>() {
                     @Override
                     public void accept(Throwable throwable) throws Throwable {
+                        Log.d(TAG, "Error: "+throwable.getMessage());
                         successInterface.onError("" + throwable.getMessage());
                     }
                 }));
