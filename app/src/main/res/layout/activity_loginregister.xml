@@ -31,27 +31,6 @@
                 android:textSize="18sp"
                 android:textStyle="bold" />
 
-<!--            <EditText-->
-<!--                android:id="@+id/userNameEditText"-->
-<!--                android:layout_width="match_parent"-->
-<!--                android:layout_height="50dp"-->
-<!--                android:layout_marginTop="100dp"-->
-<!--                android:background="@drawable/edit_text_background"-->
-<!--                android:hint="Enter Username"-->
-<!--                android:paddingLeft="15dp"-->
-<!--                android:textColor="@android:color/black" />-->
-
-<!--            <EditText-->
-<!--                android:id="@+id/pinCodeEditText"-->
-<!--                android:layout_width="match_parent"-->
-<!--                android:layout_height="50dp"-->
-<!--                android:layout_marginTop="15dp"-->
-<!--                android:background="@drawable/edit_text_background"-->
-<!--                android:hint="Enter Pin Code"-->
-<!--                android:inputType="text"-->
-<!--                android:paddingLeft="15dp"-->
-<!--                android:textColor="@android:color/black" />-->
-
             <EditText
                 android:id="@+id/userNameEditText"
                 android:layout_width="match_parent"
@@ -59,7 +38,6 @@
                 android:layout_marginTop="100dp"
                 android:background="@drawable/edit_text_background"
                 android:hint="Enter Username"
-                android:text="Abdul"
                 android:paddingLeft="15dp"
                 android:textColor="@android:color/black" />
 
@@ -70,10 +48,32 @@
                 android:layout_marginTop="15dp"
                 android:background="@drawable/edit_text_background"
                 android:hint="Enter Pin Code"
-                android:text="10111"
                 android:inputType="text"
                 android:paddingLeft="15dp"
                 android:textColor="@android:color/black" />
+
+<!--            <EditText-->
+<!--                android:id="@+id/userNameEditText"-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="50dp"-->
+<!--                android:layout_marginTop="100dp"-->
+<!--                android:background="@drawable/edit_text_background"-->
+<!--                android:hint="Enter Username"-->
+<!--                android:text="Abdul"-->
+<!--                android:paddingLeft="15dp"-->
+<!--                android:textColor="@android:color/black" />-->
+
+<!--            <EditText-->
+<!--                android:id="@+id/pinCodeEditText"-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="50dp"-->
+<!--                android:layout_marginTop="15dp"-->
+<!--                android:background="@drawable/edit_text_background"-->
+<!--                android:hint="Enter Pin Code"-->
+<!--                android:text="10111"-->
+<!--                android:inputType="text"-->
+<!--                android:paddingLeft="15dp"-->
+<!--                android:textColor="@android:color/black" />-->
 
 
             <Button
