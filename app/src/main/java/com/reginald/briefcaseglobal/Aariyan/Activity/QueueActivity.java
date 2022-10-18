@@ -70,6 +70,13 @@ public class QueueActivity extends AppCompatActivity implements HeadersInterface
         upToDate = findViewById(R.id.upToDateText);
         recyclerView = findViewById(R.id.rView);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
+
+        findViewById(R.id.backBtn).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                onBackPressed();
+            }
+        });
     }
 
     @Override

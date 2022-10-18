@@ -22,8 +22,10 @@
         android:theme="@style/Theme.Briefcaseglobal"
         android:usesCleartextTraffic="true">
         <activity
-            android:name=".QueueActivity"
-            android:exported="false">
+            android:name=".Aariyan.Activity.QueueActivity"
+            android:exported="false"
+            android:theme="@style/myTheme"
+            >
             <meta-data
                 android:name="android.app.lib_name"
                 android:value="" />
