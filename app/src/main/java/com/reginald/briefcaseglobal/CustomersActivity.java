@@ -386,6 +386,7 @@ public class CustomersActivity extends AppCompatActivity {
                         editor.putString("to", "Date To");
                     }
                     editor.putString("CODE", custcode.getText().toString().trim());
+                    editor.putString("url", IP);
                     editor.commit();
                     startActivity(new Intent(CustomersActivity.this, DealsButtonActivity.class)
                             .putExtra("url", IP));

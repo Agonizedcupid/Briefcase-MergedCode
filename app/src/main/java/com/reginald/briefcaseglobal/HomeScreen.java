@@ -190,6 +190,13 @@ public class HomeScreen extends AppCompatActivity {
                 salesLayout.setVisibility(View.GONE);
             }
         });
+        
+        findViewById(R.id.notUploadedProduct).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                seeQueueToPostRemainingData();
+            }
+        });
 
         bottomSheet = findViewById(R.id.bottomSheet);
         behavior = BottomSheetBehavior.from(bottomSheet);
@@ -304,6 +311,11 @@ public class HomeScreen extends AppCompatActivity {
         });
 
     }
+
+    private void seeQueueToPostRemainingData() {
+
+    }
+
     private boolean isMyServiceRunning() {
         ActivityManager manager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
         for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {

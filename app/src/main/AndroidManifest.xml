@@ -22,9 +22,16 @@
         android:theme="@style/Theme.Briefcaseglobal"
         android:usesCleartextTraffic="true">
         <activity
+            android:name=".QueueActivity"
+            android:exported="false">
+            <meta-data
+                android:name="android.app.lib_name"
+                android:value="" />
+        </activity>
+        <activity
             android:name=".Aariyan.Activity.SignatureActivity"
-            android:theme="@style/myTheme"
-            android:exported="false" />
+            android:exported="false"
+            android:theme="@style/myTheme" />
         <activity
             android:name=".Aariyan.Activity.DealsButtonActivity"
             android:exported="false"

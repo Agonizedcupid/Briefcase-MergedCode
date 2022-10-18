@@ -407,6 +407,16 @@
 
             </LinearLayout>
 
+            <com.google.android.material.floatingactionbutton.FloatingActionButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentBottom="true"
+                android:layout_alignParentRight="true"
+                android:layout_margin="5dp"
+                android:src="@drawable/upload_icon"
+                android:id="@+id/notUploadedProduct"
+                />
+
         </RelativeLayout>
 
     </ScrollView>
