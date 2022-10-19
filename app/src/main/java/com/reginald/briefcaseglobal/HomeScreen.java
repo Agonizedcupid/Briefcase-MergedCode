@@ -29,6 +29,7 @@ import android.widget.Toast;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.nabinbhandari.android.permissions.PermissionHandler;
 import com.nabinbhandari.android.permissions.Permissions;
+import com.reginald.briefcaseglobal.Aariyan.Activity.QueueActivity;
 
 import java.util.ArrayList;
 
@@ -191,7 +192,7 @@ public class HomeScreen extends AppCompatActivity {
             }
         });
         
-        findViewById(R.id.notUploadedProduct).setOnClickListener(new View.OnClickListener() {
+        findViewById(R.id.uploadQueue).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 seeQueueToPostRemainingData();
@@ -313,7 +314,7 @@ public class HomeScreen extends AppCompatActivity {
     }
 
     private void seeQueueToPostRemainingData() {
-
+        startActivity(new Intent(HomeScreen.this, QueueActivity.class));
     }
 
     private boolean isMyServiceRunning() {
