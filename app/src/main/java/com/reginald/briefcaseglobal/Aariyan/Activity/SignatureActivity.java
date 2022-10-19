@@ -158,6 +158,8 @@ public class SignatureActivity extends AppCompatActivity {
             startProgress("All data saved in local!");
             progressdialog.setTitle("All data saved in local!");
             progressdialog.dismiss();
+            startActivity(new Intent(SignatureActivity.this, CustomersActivity.class));
+            finish();
         } else {
             //get Location:
             progressdialog.setTitle("Posting Directly To Server!");
@@ -264,6 +266,8 @@ public class SignatureActivity extends AppCompatActivity {
             progressdialog.setTitle("No Internet, Storing in Local");
             if (databaseAdapter.insertSignature(signatureModel) > 0) {
                 Toast.makeText(this, "Saved!", Toast.LENGTH_SHORT).show();
+                startActivity(new Intent(SignatureActivity.this, CustomersActivity.class));
+                finish();
             }
             progressdialog.dismiss();
         }
