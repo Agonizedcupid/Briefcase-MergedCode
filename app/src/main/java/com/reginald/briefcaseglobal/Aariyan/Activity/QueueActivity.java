@@ -23,11 +23,14 @@ import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.reginald.briefcaseglobal.Aariyan.Adapter.QueueAdapter;
+import com.reginald.briefcaseglobal.Aariyan.Common.Constant;
 import com.reginald.briefcaseglobal.Aariyan.Database.DatabaseAdapter;
 import com.reginald.briefcaseglobal.Aariyan.Interface.HeadersInterface;
 import com.reginald.briefcaseglobal.Aariyan.Interface.RestApis;
 import com.reginald.briefcaseglobal.Aariyan.Interface.SuccessInterface;
 import com.reginald.briefcaseglobal.Aariyan.Model.HeadersModel;
+import com.reginald.briefcaseglobal.Aariyan.Model.SignatureModel;
+import com.reginald.briefcaseglobal.Aariyan.Networking.PostSignature;
 import com.reginald.briefcaseglobal.Aariyan.Networking.PostingToServer;
 import com.reginald.briefcaseglobal.Aariyan.Networking.SinglePostingFromAdapter;
 import com.reginald.briefcaseglobal.CustomersActivity;
@@ -35,6 +38,8 @@ import com.reginald.briefcaseglobal.Interface.CurrentLocation;
 import com.reginald.briefcaseglobal.Network.ApiClient;
 import com.reginald.briefcaseglobal.R;
 
+import java.net.InetAddress;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
@@ -110,29 +115,79 @@ public class QueueActivity extends AppCompatActivity implements HeadersInterface
     public void singleHeaderForPosting(HeadersModel model, int position) {
 
         //get Location:
+        if (!Constant.isInternetConnected(this)) {
+            Toast.makeText(this, "Sorry, No Internet", Toast.LENGTH_SHORT).show();
+            return;
+        }
         getCurrentLocation(new CurrentLocation() {
             @Override
             public void getLocation(double latitude, double longitude) {
                 Log.d("LOCATION_CHECKING", "getLocation: " + latitude + " - " + longitude);
-                //check data is also posted to the server or not:
-                new SinglePostingFromAdapter(databaseAdapter, restApis, latitude, longitude)
-                        .tryDirectPostingToServer(new SuccessInterface() {
-                            @Override
-                            public void onSuccess(String successMessage) {
-                                Toast.makeText(QueueActivity.this, "" + successMessage, Toast.LENGTH_SHORT).show();
-                                adapter.notifyItemRemoved(position);
-                                adapter.notifyDataSetChanged();
-                                loadData();
-                            }
+                postingSignature(model.getTransactionId(), new SuccessInterface() {
+                    @Override
+                    public void onSuccess(String successMessage) {
+                        new SinglePostingFromAdapter(databaseAdapter, restApis, latitude, longitude)
+                                .tryDirectPostingToServer(new SuccessInterface() {
+                                    @Override
+                                    public void onSuccess(String successMessage) {
+                                        Toast.makeText(QueueActivity.this, "" + successMessage, Toast.LENGTH_SHORT).show();
+                                        adapter.notifyItemRemoved(position);
+                                        adapter.notifyDataSetChanged();
+                                        loadData();
+                                    }
 
-                            @Override
-                            public void onError(String errorMessage) {
-                                Toast.makeText(QueueActivity.this, "" + errorMessage, Toast.LENGTH_SHORT).show();
-                            }
-                        }, model);
+                                    @Override
+                                    public void onError(String errorMessage) {
+                                        Toast.makeText(QueueActivity.this, "" + errorMessage, Toast.LENGTH_SHORT).show();
+                                    }
+                                }, model);
+                    }
+
+                    @Override
+                    public void onError(String errorMessage) {
+                        Toast.makeText(QueueActivity.this, ""+errorMessage, Toast.LENGTH_SHORT).show();
+                    }
+                });
             }
         });
     }
+
+    boolean isPosted = false;
+    private void postingSignature(String transactionId, SuccessInterface successInterface) {
+        List<SignatureModel> list = databaseAdapter.getSignatureByTransactionId(transactionId);
+        Log.d("ERROR_CHECKING", "postingSignature: "+transactionId + " Called");
+        if (list.size() == 0) {
+            Toast.makeText(this, "No Signature found for this Transaction", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        new PostSignature(restApis).postSignatureToServer(new SuccessInterface() {
+            @Override
+            public void onSuccess(String successMessage) {
+                Log.d("ERROR_CHECKING", "onSuccess: Called 1");
+                Toast.makeText(QueueActivity.this, "" + successMessage, Toast.LENGTH_SHORT).show();
+                successInterface.onSuccess(""+successMessage);
+            }
+
+            @Override
+            public void onError(String errorMessage) {
+                Log.d("ERROR_CHECKING", "onError: called 2"+errorMessage);
+                Toast.makeText(QueueActivity.this, "" + errorMessage, Toast.LENGTH_SHORT).show();
+                successInterface.onError(""+errorMessage);
+            }
+        }, list);
+
+    }
+
+//    public boolean isInternetAvailable() {
+//        try {
+//            InetAddress ipAddr = InetAddress.getByName("google.com");
+//            //You can replace it with your name
+//            return !ipAddr.equals("");
+//
+//        } catch (Exception e) {
+//            return false;
+//        }
+//    }
 
     private void getCurrentLocation(CurrentLocation currentLocation) {
         //Check the location permission:
@@ -147,7 +202,7 @@ public class QueueActivity extends AppCompatActivity implements HeadersInterface
                             List<Address> list = geocoder.getFromLocation(location.getLatitude(), location.getLongitude(), 1);
                             currentLocation.getLocation(list.get(0).getLatitude(), list.get(0).getLongitude());
                         } catch (Exception e) {
-
+                            Log.d("ERROR_CHECKING", "Exception: "+e.getMessage());
                         }
                     }
                 }

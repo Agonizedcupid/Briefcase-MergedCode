@@ -148,6 +148,30 @@ public class DatabaseAdapter {
 
     }
 
+    public List<SignatureModel> getSignatureByTransactionId(String transactionId) {
+
+        List<SignatureModel> listOfProducts = new ArrayList<>();
+        SQLiteDatabase database = helper.getWritableDatabase();
+        //select * from tableName where name = ? and customerName = ?:
+        // String selection = DatabaseHelper.USER_NAME+" where ? AND "+DatabaseHelper.CUSTOMER_NAME+" LIKE ?";
+        String selection = DatabaseHelper.transactionIdInSignature + "=?";
+
+
+        String[] args = {"" + transactionId};
+        String[] columns = {DatabaseHelper.UID, DatabaseHelper.SIGNATURE, DatabaseHelper.transactionIdInSignature};
+
+        Cursor cursor = database.query(DatabaseHelper.SIGNATURE_TABLE_NAME, columns, selection, args, null, null, null);
+        while (cursor.moveToNext()) {
+            SignatureModel model = new SignatureModel(
+                    cursor.getString(1),
+                    cursor.getString(2)
+            );
+            listOfProducts.add(model);
+        }
+        return listOfProducts;
+
+    }
+
     public List<LinesModel> getLines() {
         List<LinesModel> listOfLines = new ArrayList<>();
         SQLiteDatabase database = helper.getWritableDatabase();
@@ -341,7 +365,7 @@ public class DatabaseAdapter {
         private Context context;
 
         private static final String DATABASE_NAME = "BRIEFCASE_DB.db";
-        private static final int VERSION_NUMBER = 11;
+        private static final int VERSION_NUMBER = 25;
 
         /**
          *  Product table
@@ -417,7 +441,7 @@ public class DatabaseAdapter {
         private static final String DROP_DEALS_LINES_TABLE = "DROP TABLE IF EXISTS " + DEALS_LINES_TABLE_NAME;
 
 
-        private static final String SIGNATURE_TABLE_NAME = "SIGNATURE";
+        private static final String SIGNATURE_TABLE_NAME = "SIGNATURE_TABLE";
         private static final String SIGNATURE = "signature";
         private static final String transactionIdInSignature = "transactionId";
 

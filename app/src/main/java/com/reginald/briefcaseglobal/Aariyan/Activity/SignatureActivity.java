@@ -31,6 +31,7 @@ import com.google.android.gms.common.api.Api;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.reginald.briefcaseglobal.Aariyan.Common.Constant;
 import com.reginald.briefcaseglobal.Aariyan.Database.DatabaseAdapter;
 import com.reginald.briefcaseglobal.Aariyan.Interface.RestApis;
 import com.reginald.briefcaseglobal.Aariyan.Interface.SuccessInterface;
@@ -138,23 +139,23 @@ public class SignatureActivity extends AppCompatActivity {
         });
     }
 
-    public boolean isInternetAvailable() {
-        try {
-            InetAddress ipAddr = InetAddress.getByName("google.com");
-            //You can replace it with your name
-            return !ipAddr.equals("");
-
-        } catch (Exception e) {
-            return false;
-        }
-    }
+//    public boolean isInternetAvailable() {
+//        try {
+//            InetAddress ipAddr = InetAddress.getByName("google.com");
+//            //You can replace it with your name
+//            return !ipAddr.equals("");
+//        } catch (Exception e) {
+//            return false;
+//        }
+//    }
 
     private void updateIsCompleteToOne(int flag) {
         if (databaseAdapter.updateDealsHeadersIsCompleted(flag) > 0) {
             Toast.makeText(this, "Updated Locally", Toast.LENGTH_SHORT).show();
         }
 
-        if (!isInternetAvailable()) {
+        if (!Constant.isInternetConnected(this)) {
+            startProgress("All data saved in local!");
             progressdialog.setTitle("All data saved in local!");
             progressdialog.dismiss();
         } else {
@@ -243,7 +244,7 @@ public class SignatureActivity extends AppCompatActivity {
 
         startProgress("Posting Signature");
         signatureModel = new SignatureModel(tId, signature);
-        if (isInternetAvailable()) {
+        if (Constant.isInternetConnected(this)) {
             List<SignatureModel> list = new ArrayList<>();
             list.add(signatureModel);
             new PostSignature(restApis).postSignatureToServer(new SuccessInterface() {
