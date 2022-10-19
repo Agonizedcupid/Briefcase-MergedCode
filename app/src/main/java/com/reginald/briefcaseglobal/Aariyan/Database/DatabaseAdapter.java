@@ -13,6 +13,7 @@ import com.reginald.briefcaseglobal.Aariyan.Model.DealHeaderModel;
 import com.reginald.briefcaseglobal.Aariyan.Model.HeadersModel;
 import com.reginald.briefcaseglobal.Aariyan.Model.LinesModel;
 import com.reginald.briefcaseglobal.Aariyan.Model.ProductModel;
+import com.reginald.briefcaseglobal.Aariyan.Model.SignatureModel;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -74,6 +75,17 @@ public class DatabaseAdapter {
         contentValues.put(DatabaseHelper.transactionIdInLines, model.getTransactionId());
 
         long id = database.insert(DatabaseHelper.DEALS_LINES_TABLE_NAME, null, contentValues);
+        return id;
+    }
+
+    public long insertSignature(SignatureModel model) {
+        SQLiteDatabase database = helper.getWritableDatabase();
+
+        ContentValues contentValues = new ContentValues();
+        contentValues.put(DatabaseHelper.SIGNATURE, model.getSignature());
+        contentValues.put(DatabaseHelper.transactionIdInSignature, model.getTransactionId());
+
+        long id = database.insert(DatabaseHelper.SIGNATURE_TABLE_NAME, null, contentValues);
         return id;
     }
 
@@ -405,6 +417,19 @@ public class DatabaseAdapter {
         private static final String DROP_DEALS_LINES_TABLE = "DROP TABLE IF EXISTS " + DEALS_LINES_TABLE_NAME;
 
 
+        private static final String SIGNATURE_TABLE_NAME = "SIGNATURE";
+        private static final String SIGNATURE = "signature";
+        private static final String transactionIdInSignature = "transactionId";
+
+        //Creating the table:
+        private static final String CREATE_SIGNATURE_TABLE = "CREATE TABLE " + SIGNATURE_TABLE_NAME
+                + " (" + UID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
+                + SIGNATURE + " VARCHAR(255),"
+                + transactionIdInSignature + " VARCHAR(255));";
+
+        private static final String DROP_SIGNATURE_TABLE = "DROP TABLE IF EXISTS " + SIGNATURE_TABLE_NAME;
+
+
 
         public DatabaseHelper(@Nullable Context context) {
             super(context, DATABASE_NAME, null, VERSION_NUMBER);
@@ -418,6 +443,7 @@ public class DatabaseAdapter {
                 db.execSQL(CREATE_PRODUCT_TABLE);
                 db.execSQL(CREATE_DEALS_HEADERS_TABLE);
                 db.execSQL(CREATE_DEALS_LINES_TABLE);
+                db.execSQL(CREATE_SIGNATURE_TABLE);
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -430,6 +456,7 @@ public class DatabaseAdapter {
                 db.execSQL(DROP_PRODUCT_TABLE);
                 db.execSQL(DROP_DEALS_HEADERS_TABLE);
                 db.execSQL(DROP_DEALS_LINES_TABLE);
+                db.execSQL(DROP_SIGNATURE_TABLE);
                 onCreate(db);
             } catch (Exception e) {
                 e.printStackTrace();

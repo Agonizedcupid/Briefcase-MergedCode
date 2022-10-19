@@ -58,6 +58,7 @@ import org.json.JSONObject;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -73,6 +74,8 @@ public class SignatureActivity extends AppCompatActivity {
     private String tId = "";
 
     FusedLocationProviderClient client;
+
+    SignatureModel signatureModel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -135,33 +138,51 @@ public class SignatureActivity extends AppCompatActivity {
         });
     }
 
+    public boolean isInternetAvailable() {
+        try {
+            InetAddress ipAddr = InetAddress.getByName("google.com");
+            //You can replace it with your name
+            return !ipAddr.equals("");
+
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
     private void updateIsCompleteToOne(int flag) {
         if (databaseAdapter.updateDealsHeadersIsCompleted(flag) > 0) {
-            Toast.makeText(this, "Updated", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Updated Locally", Toast.LENGTH_SHORT).show();
         }
 
-        //get Location:
-        getCurrentLocation(new CurrentLocation() {
-            @Override
-            public void getLocation(double latitude, double longitude) {
-                Log.d("LOCATION_CHECKING", "getLocation: "+latitude +" - "+longitude);
-                //check data is also posted to the server or not:
-                new PostingToServer(databaseAdapter, restApis, latitude, longitude)
-                        .tryDirectPostingToServer(new SuccessInterface() {
-                            @Override
-                            public void onSuccess(String successMessage) {
-                                Toast.makeText(SignatureActivity.this, "" + successMessage, Toast.LENGTH_SHORT).show();
-                                startActivity(new Intent(SignatureActivity.this, CustomersActivity.class));
-                            }
+        if (!isInternetAvailable()) {
+            progressdialog.setTitle("All data saved in local!");
+            progressdialog.dismiss();
+        } else {
+            //get Location:
+            progressdialog.setTitle("Posting Directly To Server!");
+            getCurrentLocation(new CurrentLocation() {
+                @Override
+                public void getLocation(double latitude, double longitude) {
+                    Log.d("LOCATION_CHECKING", "getLocation: " + latitude + " - " + longitude);
+                    //check data is also posted to the server or not:
+                    new PostingToServer(databaseAdapter, restApis, latitude, longitude)
+                            .tryDirectPostingToServer(new SuccessInterface() {
+                                @Override
+                                public void onSuccess(String successMessage) {
+                                    Toast.makeText(SignatureActivity.this, "" + successMessage, Toast.LENGTH_SHORT).show();
+                                    startActivity(new Intent(SignatureActivity.this, CustomersActivity.class));
+                                }
 
-                            @Override
-                            public void onError(String errorMessage) {
-                                Toast.makeText(SignatureActivity.this, "" + errorMessage, Toast.LENGTH_SHORT).show();
-                            }
-                        });
-            }
-        });
+                                @Override
+                                public void onError(String errorMessage) {
+                                    Toast.makeText(SignatureActivity.this, "" + errorMessage, Toast.LENGTH_SHORT).show();
+                                }
+                            });
+                }
+            });
 
+            progressdialog.dismiss();
+        }
     }
 
     private void getCurrentLocation(CurrentLocation currentLocation) {
@@ -220,21 +241,31 @@ public class SignatureActivity extends AppCompatActivity {
         byte[] byteImage = outputStream.toByteArray();
         String signature = Base64.encodeToString(byteImage, Base64.DEFAULT);
 
-        startProgress("Syncing");
-        SignatureModel signatureModel = new SignatureModel(tId, signature);
-        List<SignatureModel> list = new ArrayList<>();
-        list.add(signatureModel);
-        new PostSignature(restApis).postSignatureToServer(new SuccessInterface() {
-            @Override
-            public void onSuccess(String successMessage) {
-                Toast.makeText(SignatureActivity.this, ""+successMessage, Toast.LENGTH_SHORT).show();
-            }
+        startProgress("Posting Signature");
+        signatureModel = new SignatureModel(tId, signature);
+        if (isInternetAvailable()) {
+            List<SignatureModel> list = new ArrayList<>();
+            list.add(signatureModel);
+            new PostSignature(restApis).postSignatureToServer(new SuccessInterface() {
+                @Override
+                public void onSuccess(String successMessage) {
+                    Toast.makeText(SignatureActivity.this, "" + successMessage, Toast.LENGTH_SHORT).show();
+                    progressdialog.dismiss();
+                }
 
-            @Override
-            public void onError(String errorMessage) {
-                Toast.makeText(SignatureActivity.this, ""+errorMessage, Toast.LENGTH_SHORT).show();
+                @Override
+                public void onError(String errorMessage) {
+                    Toast.makeText(SignatureActivity.this, "" + errorMessage, Toast.LENGTH_SHORT).show();
+                    progressdialog.dismiss();
+                }
+            }, list);
+        } else {
+            progressdialog.setTitle("No Internet, Storing in Local");
+            if (databaseAdapter.insertSignature(signatureModel) > 0) {
+                Toast.makeText(this, "Saved!", Toast.LENGTH_SHORT).show();
             }
-        }, list);
+            progressdialog.dismiss();
+        }
 
         //new postSignatureWithTransactionId(String.valueOf("" + transactionId()), signature).execute();
     }
