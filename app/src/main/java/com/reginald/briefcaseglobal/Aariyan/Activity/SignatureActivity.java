@@ -245,6 +245,7 @@ public class SignatureActivity extends AppCompatActivity {
         startProgress("Posting Signature");
         signatureModel = new SignatureModel(tId, signature);
         if (Constant.isInternetConnected(this)) {
+            progressdialog.setTitle("Posting To Server");
             List<SignatureModel> list = new ArrayList<>();
             list.add(signatureModel);
             new PostSignature(restApis).postSignatureToServer(new SuccessInterface() {
@@ -264,6 +265,8 @@ public class SignatureActivity extends AppCompatActivity {
             progressdialog.setTitle("No Internet, Storing in Local");
             if (databaseAdapter.insertSignature(signatureModel) > 0) {
                 Toast.makeText(this, "Saved!", Toast.LENGTH_SHORT).show();
+                startActivity(new Intent(SignatureActivity.this, CustomersActivity.class));
+                finish();
             }
             progressdialog.dismiss();
         }
