@@ -96,6 +96,14 @@ public class SignatureActivity extends AppCompatActivity {
 
 
     private void initUI() {
+
+        findViewById(R.id.backBtn).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onBackPressed();
+            }
+        });
+
         ImageView undoSignature = findViewById(R.id.undoSignature);
         undoSignature.setVisibility(View.GONE);
         SignaturePad ack_sign = findViewById(R.id.ack_sign);
@@ -151,41 +159,49 @@ public class SignatureActivity extends AppCompatActivity {
 
     private void updateIsCompleteToOne(int flag) {
         if (databaseAdapter.updateDealsHeadersIsCompleted(flag) > 0) {
-            Toast.makeText(this, "Updated Locally", Toast.LENGTH_SHORT).show();
-        }
-
-        if (!Constant.isInternetConnected(this)) {
-            startProgress("All data saved in local!");
-            progressdialog.setTitle("All data saved in local!");
-            progressdialog.dismiss();
-            startActivity(new Intent(SignatureActivity.this, CustomersActivity.class));
+            //Toast.makeText(this, "Updated Locally", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Added into QUEUE!", Toast.LENGTH_SHORT).show();
+            startActivity(new Intent(SignatureActivity.this, CustomersActivity.class)
+                    .setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+                    .setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK));
             finish();
+            return;
         } else {
-            //get Location:
-            progressdialog.setTitle("Posting Directly To Server!");
-            getCurrentLocation(new CurrentLocation() {
-                @Override
-                public void getLocation(double latitude, double longitude) {
-                    Log.d("LOCATION_CHECKING", "getLocation: " + latitude + " - " + longitude);
-                    //check data is also posted to the server or not:
-                    new PostingToServer(databaseAdapter, restApis, latitude, longitude)
-                            .tryDirectPostingToServer(new SuccessInterface() {
-                                @Override
-                                public void onSuccess(String successMessage) {
-                                    Toast.makeText(SignatureActivity.this, "" + successMessage, Toast.LENGTH_SHORT).show();
-                                    startActivity(new Intent(SignatureActivity.this, CustomersActivity.class));
-                                }
-
-                                @Override
-                                public void onError(String errorMessage) {
-                                    Toast.makeText(SignatureActivity.this, "" + errorMessage, Toast.LENGTH_SHORT).show();
-                                }
-                            });
-                }
-            });
-
-            progressdialog.dismiss();
+            Toast.makeText(this, "Unable to Add into QUEUE!", Toast.LENGTH_SHORT).show();
         }
+
+//        if (!Constant.isInternetConnected(this)) {
+//            startProgress("All data saved in local!");
+//            progressdialog.setTitle("All data saved in local!");
+//            progressdialog.dismiss();
+//            startActivity(new Intent(SignatureActivity.this, CustomersActivity.class));
+//            finish();
+//        } else {
+//            //get Location:
+//            progressdialog.setTitle("Posting Directly To Server!");
+//            getCurrentLocation(new CurrentLocation() {
+//                @Override
+//                public void getLocation(double latitude, double longitude) {
+//                    Log.d("LOCATION_CHECKING", "getLocation: " + latitude + " - " + longitude);
+//                    //check data is also posted to the server or not:
+//                    new PostingToServer(databaseAdapter, restApis, latitude, longitude)
+//                            .tryDirectPostingToServer(new SuccessInterface() {
+//                                @Override
+//                                public void onSuccess(String successMessage) {
+//                                    Toast.makeText(SignatureActivity.this, "" + successMessage, Toast.LENGTH_SHORT).show();
+//                                    startActivity(new Intent(SignatureActivity.this, CustomersActivity.class));
+//                                }
+//
+//                                @Override
+//                                public void onError(String errorMessage) {
+//                                    Toast.makeText(SignatureActivity.this, "" + errorMessage, Toast.LENGTH_SHORT).show();
+//                                }
+//                            });
+//                }
+//            });
+//
+//            progressdialog.dismiss();
+//        }
     }
 
     private void getCurrentLocation(CurrentLocation currentLocation) {
@@ -244,34 +260,44 @@ public class SignatureActivity extends AppCompatActivity {
         byte[] byteImage = outputStream.toByteArray();
         String signature = Base64.encodeToString(byteImage, Base64.DEFAULT);
 
-        startProgress("Posting Signature");
+        //startProgress("Posting Signature");
         signatureModel = new SignatureModel(tId, signature);
-        if (Constant.isInternetConnected(this)) {
-            progressdialog.setTitle("Posting To Server");
-            List<SignatureModel> list = new ArrayList<>();
-            list.add(signatureModel);
-            new PostSignature(restApis).postSignatureToServer(new SuccessInterface() {
-                @Override
-                public void onSuccess(String successMessage) {
-                    Toast.makeText(SignatureActivity.this, "" + successMessage, Toast.LENGTH_SHORT).show();
-                    progressdialog.dismiss();
-                }
-
-                @Override
-                public void onError(String errorMessage) {
-                    Toast.makeText(SignatureActivity.this, "" + errorMessage, Toast.LENGTH_SHORT).show();
-                    progressdialog.dismiss();
-                }
-            }, list);
-        } else {
-            progressdialog.setTitle("No Internet, Storing in Local");
-            if (databaseAdapter.insertSignature(signatureModel) > 0) {
-                Toast.makeText(this, "Saved!", Toast.LENGTH_SHORT).show();
-                startActivity(new Intent(SignatureActivity.this, CustomersActivity.class));
-                finish();
-            }
-            progressdialog.dismiss();
+        /**
+         *  Removing this part, because direct posting sometimes creating problems.
+         *  All data will work like a QUEUE
+         */
+        if (databaseAdapter.insertSignature(signatureModel) > 0) {
+            Toast.makeText(this, "Signature Saved!", Toast.LENGTH_SHORT).show();
+            startActivity(new Intent(SignatureActivity.this, CustomersActivity.class));
+            finish();
         }
+
+//        if (Constant.isInternetConnected(this)) {
+//            progressdialog.setTitle("Posting To Server");
+//            List<SignatureModel> list = new ArrayList<>();
+//            list.add(signatureModel);
+//            new PostSignature(restApis).postSignatureToServer(new SuccessInterface() {
+//                @Override
+//                public void onSuccess(String successMessage) {
+//                    Toast.makeText(SignatureActivity.this, "" + successMessage, Toast.LENGTH_SHORT).show();
+//                    progressdialog.dismiss();
+//                }
+//
+//                @Override
+//                public void onError(String errorMessage) {
+//                    Toast.makeText(SignatureActivity.this, "" + errorMessage, Toast.LENGTH_SHORT).show();
+//                    progressdialog.dismiss();
+//                }
+//            }, list);
+//        } else {
+//            progressdialog.setTitle("No Internet, Storing in Local");
+//            if (databaseAdapter.insertSignature(signatureModel) > 0) {
+//                Toast.makeText(this, "Saved!", Toast.LENGTH_SHORT).show();
+//                startActivity(new Intent(SignatureActivity.this, CustomersActivity.class));
+//                finish();
+//            }
+//            progressdialog.dismiss();
+//        }
 
         //new postSignatureWithTransactionId(String.valueOf("" + transactionId()), signature).execute();
     }

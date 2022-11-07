@@ -327,16 +327,36 @@ public class DatabaseAdapter {
      *  Delete
      */
 
-//    public long deleteQueue(int id) {
-//        SQLiteDatabase database = helper.getWritableDatabase();
-//        //select * from table_name where id = id
-//        String selection = DatabaseHelper.UID + " LIKE ?";
-//
-//        String[] args = {"" + id};
-//        long ids = database.delete(DatabaseHelper.QUEUE_TABLE_NAME, selection, args);
-//
-//        return ids;
-//    }
+    public long deleteSignature(String transactionId) {
+        SQLiteDatabase database = helper.getWritableDatabase();
+        //select * from table_name where id = id
+        String selection = DatabaseHelper.transactionIdInSignature + " LIKE ?";
+
+        String[] args = {"" + transactionId};
+        long ids = database.delete(DatabaseHelper.SIGNATURE_TABLE_NAME, selection, args);
+
+        return ids;
+    }
+
+    public long deleteLines(String transactionId) {
+        SQLiteDatabase database = helper.getWritableDatabase();
+        //select * from table_name where id = id
+        String selection = DatabaseHelper.transactionIdInSignature + " LIKE ?";
+        String[] args = {"" + transactionId};
+        long ids = database.delete(DatabaseHelper.DEALS_LINES_TABLE_NAME, selection, args);
+
+        return ids;
+    }
+
+    public long deleteDeals(String transactionId) {
+        SQLiteDatabase database = helper.getWritableDatabase();
+        //select * from table_name where id = id
+        String selection = DatabaseHelper.transactionIdInSignature + " LIKE ?";
+        String[] args = {"" + transactionId};
+        long ids = database.delete(DatabaseHelper.DEALS_HEADERS_TABLE_NAME, selection, args);
+
+        return ids;
+    }
 
     /**
      * Drop Header table

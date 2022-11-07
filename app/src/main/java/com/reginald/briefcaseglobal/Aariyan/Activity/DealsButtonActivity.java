@@ -58,7 +58,7 @@ public class DealsButtonActivity extends AppCompatActivity {
 //        });
         toolbarTitle = findViewById(R.id.toolbarTitle);
         setFragment(new CreateDealsFragment());
-        toolbarTitle.setText("Create new customer deals for : ");
+        toolbarTitle.setText("Create new customer deals for");
 
         bottomNavigationView = findViewById(R.id.bottomNavigationView);
         bottomNavigationView.setOnItemSelectedListener(new NavigationBarView.OnItemSelectedListener() {
@@ -68,11 +68,11 @@ public class DealsButtonActivity extends AppCompatActivity {
                 switch (id) {
                     case R.id.createDealsMenu:
                         setFragment(new CreateDealsFragment());
-                        toolbarTitle.setText("Create new customer deals for : ");
+                        toolbarTitle.setText("Create new customer deals");
                         return true;
                     case R.id.updateDealsMenu:
                         setFragment(new UpdateDealsFragment());
-                        toolbarTitle.setText("Update deals for existing customer: ");
+                        toolbarTitle.setText("Update deals for existing customer");
                         return true;
                 }
                 return false;

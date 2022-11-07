@@ -44,10 +44,18 @@ public class QueueAdapter extends RecyclerView.Adapter<QueueAdapter.ViewHolder> 
         try {
             holder.itemName.setText(model.getProductName());
             holder.itemPrice.setText(String.valueOf(model.getProductPrice()));
-            holder.itemView.setOnClickListener(new View.OnClickListener() {
+//            holder.itemView.setOnClickListener(new View.OnClickListener() {
+//                @Override
+//                public void onClick(View v) {
+//                    headersInterface.singleHeaderForPosting(model, position);
+//                }
+//            });
+
+            holder.itemView.setOnLongClickListener(new View.OnLongClickListener() {
                 @Override
-                public void onClick(View v) {
+                public boolean onLongClick(View v) {
                     headersInterface.singleHeaderForPosting(model, position);
+                    return true;
                 }
             });
 
