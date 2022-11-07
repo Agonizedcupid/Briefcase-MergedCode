@@ -17,6 +17,7 @@ import androidx.work.Data;
 
 import android.Manifest;
 import android.app.Dialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
@@ -274,7 +275,23 @@ public class QueueActivity extends AppCompatActivity implements HeadersInterface
             case R.id.backUpData:
                 //startActivity(new Intent(QueueActivity.this, QueueActivity.class));
                 if (checkPermission()) {
-                    exportDBToInternalStorage();
+                    AlertDialog alertDialog = new AlertDialog.Builder(QueueActivity.this).create();
+                    alertDialog.setTitle("Alert");
+                    alertDialog.setMessage("It will take a back up of Local database, FOLDER: DOWNLOAD/BRIEF_CASE_BACKUP");
+                    alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "OK",
+                            new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int which) {
+                                    exportDBToInternalStorage();
+                                    dialog.dismiss();
+                                }
+                            });
+                    alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "NO",
+                            new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int which) {
+                                    dialog.dismiss();
+                                }
+                            });
+                    alertDialog.show();
                 } else {
                     requestPermission();
                 }
