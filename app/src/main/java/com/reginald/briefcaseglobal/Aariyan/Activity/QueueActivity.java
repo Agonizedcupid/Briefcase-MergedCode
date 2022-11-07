@@ -116,7 +116,23 @@ public class QueueActivity extends AppCompatActivity implements HeadersInterface
             @Override
             public void onClick(View v) {
                 if (checkPermission()) {
-                    exportDBToInternalStorage();
+                    AlertDialog alertDialog = new AlertDialog.Builder(QueueActivity.this).create();
+                    alertDialog.setTitle("Alert");
+                    alertDialog.setMessage("It will take a back up of Local database.\nFOLDER: DOWNLOAD/BRIEF_CASE_BACKUP");
+                    alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "OK",
+                            new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int which) {
+                                    exportDBToInternalStorage();
+                                    dialog.dismiss();
+                                }
+                            });
+                    alertDialog.setButton(AlertDialog.BUTTON_NEGATIVE, "NO",
+                            new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int which) {
+                                    dialog.dismiss();
+                                }
+                            });
+                    alertDialog.show();
                 } else {
                     requestPermission();
                 }
@@ -166,10 +182,10 @@ public class QueueActivity extends AppCompatActivity implements HeadersInterface
 
         //Signature:
         if (signatureModel.size() > 0) {
-            dealTextView.setCompoundDrawablesRelativeWithIntrinsicBounds(0, 0, R.drawable.tik_with_green_background, 0);
+            signatureTextView.setCompoundDrawablesRelativeWithIntrinsicBounds(0, 0, R.drawable.tik_with_green_background, 0);
             missingFeedback.append("Signature Found! \n");
         } else {
-            dealTextView.setCompoundDrawablesRelativeWithIntrinsicBounds(0, 0, R.drawable.close_with_red_background, 0);
+            signatureTextView.setCompoundDrawablesRelativeWithIntrinsicBounds(0, 0, R.drawable.close_with_red_background, 0);
             missingFeedback.append("Signature Not Found! \n");
         }
         signatureTextView.setVisibility(View.VISIBLE);
@@ -217,6 +233,7 @@ public class QueueActivity extends AppCompatActivity implements HeadersInterface
                         .tryDirectPostingToServer(new SuccessInterface() {
                             @Override
                             public void onSuccess(String successMessage) {
+                                Log.d("LINE_POSTING_ERROR", "onError: "+successMessage);
                                 Toast.makeText(QueueActivity.this, "" + successMessage, Toast.LENGTH_SHORT).show();
                                 adapter.notifyItemRemoved(adapterPosition);
                                 adapter.notifyDataSetChanged();
@@ -225,6 +242,7 @@ public class QueueActivity extends AppCompatActivity implements HeadersInterface
 
                             @Override
                             public void onError(String errorMessage) {
+                                Log.d("LINE_POSTING_ERROR", "onError: "+errorMessage);
                                 Toast.makeText(QueueActivity.this, "" + errorMessage, Toast.LENGTH_SHORT).show();
                             }
                         }, model);
@@ -241,6 +259,8 @@ public class QueueActivity extends AppCompatActivity implements HeadersInterface
         long deletedSignature = databaseAdapter.deleteSignature(transactionId);
         long deletedLines = databaseAdapter.deleteLines(transactionId);
         long deletedDeals = databaseAdapter.deleteDeals(transactionId);
+
+        Log.d("DELETE_OPERATIONS", ""+deletedDeals + " -> "+deletedLines + " -> "+deletedSignature);
 
         adapter.notifyItemRemoved(adapterPosition);
         adapter.notifyDataSetChanged();
@@ -470,7 +490,7 @@ public class QueueActivity extends AppCompatActivity implements HeadersInterface
 
     private void postingSignature(String transactionId, SuccessInterface successInterface) {
         List<SignatureModel> list = databaseAdapter.getSignatureByTransactionId(transactionId);
-        Log.d("ERROR_CHECKING", "postingSignature: " + transactionId + " Called");
+        //Log.d("ERROR_CHECKING", "postingSignature: " + transactionId + " Called");
         if (list.size() == 0) {
             Toast.makeText(this, "No Signature found for this Transaction", Toast.LENGTH_SHORT).show();
             return;
@@ -479,7 +499,7 @@ public class QueueActivity extends AppCompatActivity implements HeadersInterface
             @Override
             public void onSuccess(String successMessage) {
                 Log.d("ERROR_CHECKING", "onSuccess: Called 1");
-                Toast.makeText(QueueActivity.this, "" + successMessage, Toast.LENGTH_SHORT).show();
+                //Toast.makeText(QueueActivity.this, "" + successMessage, Toast.LENGTH_SHORT).show();
                 successInterface.onSuccess("" + successMessage);
             }
 
