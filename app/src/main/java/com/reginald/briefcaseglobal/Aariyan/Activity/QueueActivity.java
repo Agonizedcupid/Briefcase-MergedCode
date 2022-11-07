@@ -1,8 +1,16 @@
 package com.reginald.briefcaseglobal.Aariyan.Activity;
 
+import static android.Manifest.permission.READ_EXTERNAL_STORAGE;
+import static android.Manifest.permission.WRITE_EXTERNAL_STORAGE;
+
+import static com.github.mikephil.charting.charts.Chart.LOG_TAG;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.work.Data;
@@ -15,10 +23,16 @@ import android.content.pm.PackageManager;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
+import android.provider.Settings;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
 import android.widget.ProgressBar;
@@ -45,13 +59,20 @@ import com.reginald.briefcaseglobal.Interface.CurrentLocation;
 import com.reginald.briefcaseglobal.Network.ApiClient;
 import com.reginald.briefcaseglobal.R;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.net.InetAddress;
+import java.nio.channels.FileChannel;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
 public class QueueActivity extends AppCompatActivity implements HeadersInterface {
 
+    private static final int PERMISSION_REQUEST_CODE = 101;
     private TextView upToDate;
     private RecyclerView recyclerView;
     private DatabaseAdapter databaseAdapter;
@@ -89,6 +110,17 @@ public class QueueActivity extends AppCompatActivity implements HeadersInterface
 //                showAlert();
 //            }
 //        },1000);
+
+        findViewById(R.id.backUpDatabase).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (checkPermission()) {
+                    exportDBToInternalStorage();
+                } else {
+                    requestPermission();
+                }
+            }
+        });
     }
 
     private void showAlert(HeadersModel model, int adapterPosition, double latitude, double longitude) {
@@ -227,6 +259,148 @@ public class QueueActivity extends AppCompatActivity implements HeadersInterface
                 onBackPressed();
             }
         });
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.queue_menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        int id = item.getItemId();
+        switch (id) {
+            case R.id.backUpData:
+                //startActivity(new Intent(QueueActivity.this, QueueActivity.class));
+                if (checkPermission()) {
+                    exportDBToInternalStorage();
+                } else {
+                    requestPermission();
+                }
+                break;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    private void exportDBToInternalStorage() {
+        File path = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS) + "/BRIEF_CASE_BACKUP");
+        if (!path.exists()) {
+            path.mkdir();
+        }
+        String fileName = "QUEUE_NOT_UPLOADED_N_" + System.currentTimeMillis();
+//        File file = new File(path, fileName);
+//        String filePath = file.getAbsolutePath();
+       // File sd = Environment.getExternalStorageDirectory();
+        if (path.canWrite()) {
+            //final File[] databases = new File(getFilesDir().getParentFile().getPath() + "/databases").listFiles();
+            //final File[] databases = new File(getFilesDir().getParentFile().getPath() + "/databases").listFiles();
+            final File databases = new File(getFilesDir().getParentFile().getPath() + "/databases/BRIEFCASE_DB.db");
+//            for (File file : databases) {
+//                Log.d("CHECK_DB_LIST", "exportDBToInternalStorage: "+file);
+//            }
+
+            //for (File databaseFile: databases) {
+                final String backupFilename = databases.getName() + "-QUEUE_NOT_UPLOADED_N_" +
+                        "-" + System.currentTimeMillis() + ".db";
+                File backupFile = new File(path, backupFilename);
+                FileChannel inputChannel = null;
+                FileChannel outputChannel = null;
+
+                try {
+                    Log.d(LOG_TAG, "Backing up: " + databases + " to file: " + backupFile);
+                    inputChannel = new FileInputStream(databases.getAbsolutePath()).getChannel();
+                    outputChannel = new FileOutputStream(backupFile).getChannel();
+                    outputChannel.transferFrom(inputChannel, 0, inputChannel.size());
+                } catch (FileNotFoundException e) {
+                    e.printStackTrace();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                } finally {
+                    if (inputChannel != null) {
+                        try {
+                            inputChannel.close();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    }
+
+                    if (outputChannel != null) {
+                        try {
+                            outputChannel.close();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
+           // }
+        } else {
+            Log.w(LOG_TAG, "Can't write to sdcard");
+        }
+
+
+    }
+
+    private boolean checkPermission() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            return Environment.isExternalStorageManager();
+        } else {
+            int result = ContextCompat.checkSelfPermission(this, READ_EXTERNAL_STORAGE);
+            int result1 = ContextCompat.checkSelfPermission(this, WRITE_EXTERNAL_STORAGE);
+            return result == PackageManager.PERMISSION_GRANTED && result1 == PackageManager.PERMISSION_GRANTED;
+        }
+    }
+
+    private void requestPermission() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            try {
+                Intent intent = new Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION);
+                intent.addCategory("android.intent.category.DEFAULT");
+                intent.setData(Uri.parse(String.format("package:%s", getApplicationContext().getPackageName())));
+                startActivityForResult(intent, 2296);
+            } catch (Exception e) {
+                Intent intent = new Intent();
+                intent.setAction(Settings.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION);
+                startActivityForResult(intent, 2296);
+            }
+        } else {
+            //below android 11
+            ActivityCompat.requestPermissions(this, new String[]{WRITE_EXTERNAL_STORAGE}, PERMISSION_REQUEST_CODE);
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == 2296) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                if (Environment.isExternalStorageManager()) {
+                    // perform action when allow permission success
+                    exportDBToInternalStorage();
+                } else {
+                    Toast.makeText(this, "Allow permission for storage access!", Toast.LENGTH_SHORT).show();
+                }
+            }
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        switch (requestCode) {
+            case PERMISSION_REQUEST_CODE:
+                if (grantResults.length > 0) {
+                    boolean READ_EXTERNAL_STORAGE = grantResults[0] == PackageManager.PERMISSION_GRANTED;
+                    boolean WRITE_EXTERNAL_STORAGE = grantResults[1] == PackageManager.PERMISSION_GRANTED;
+
+                    if (READ_EXTERNAL_STORAGE && WRITE_EXTERNAL_STORAGE) {
+                        // perform action when allow permission success
+                        exportDBToInternalStorage();
+                    } else {
+                        Toast.makeText(this, "Allow permission for storage access!", Toast.LENGTH_SHORT).show();
+                    }
+                }
+                break;
+        }
     }
 
     @Override

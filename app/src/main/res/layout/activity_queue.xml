@@ -31,13 +31,20 @@
 
             <TextView
                 android:id="@+id/toolbarTitle"
-                android:layout_width="wrap_content"
+                android:layout_width="250dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="15dp"
                 android:text="Not Uploaded Yet"
                 android:textStyle="bold"
                 android:textSize="16sp"
                 android:textColor="@android:color/white"
+                />
+
+            <ImageView
+                android:id="@+id/backUpDatabase"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/upload_icon"
                 />
 
         </LinearLayout>
